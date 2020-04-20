@@ -1,0 +1,131 @@
+  
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Sign Up
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<script>
+        function appReq(reqid){
+               
+                var link = "{{url_for('approvereq', req_id ='reqid') }}".replace('reqid', reqid);
+                window.location.href= link;
+	}
+        function denyReq(reqid){
+
+                var link = "{{url_for('denyreq', req_id ='reqid') }}".replace('reqid', reqid);
+                window.location.href= link;
+        }
+</script>
+<link rel="stylesheet" href="{{url_for('.static', filename='signin.css')}}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+ <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Radiology Images</th>
+                  <th>Radiology Imaging Reports</th>
+		  <th>EKG</th>
+		  <th>Progress Notes</th>
+		  <th>History</th>
+		  <th>Operational Report</th>
+		  <th>Pathology Report</th>
+		  <th>Laboratory Report</th>
+			<th>Photographs</th>
+		  <th>Discharge Summaries</th>
+		  <th>Health Care Billing</th>
+			<th>Consultation</th>
+		  <th>Medication</th>
+		  <th>Emergency</th>
+		  <th>Dental</th>
+		  <th>Demographic</th>
+		  <th>Question</th>
+		  <th>Audiotape</th>
+		  <th>Beta Value</th>
+		  <th>Dirichlet value</th>
+		 
+		  
+                </tr>
+              </thead>
+              <tbody>
+                
+			
+                   
+			    <tr> 
+				    {% for pendingreq_info in pendingreq_info %}
+				    <td>{{pendingreq_info.radiology_images}}</td>
+			    
+			   
+                              	    <td>{{pendingreq_info.radiology_imaging_reports}}</td>
+			    
+				    <td>{{pendingreq_info.ekg}}</td>
+			    
+				    <td>{{pendingreq_info.progress_notes}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.history_phy}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.oper_report}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.path_report}}</td>
+			   
+			   
+				    <td>{{pendingreq_info.lab_report}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.photographs}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.discharge_summaries}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.health_care_billing}}</td>
+			   
+			    
+				    <td>{{pendingreq_info.consult}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.medication}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.emergency}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.dental}}</td>
+			    
+				    <td>{{pendingreq_info.demographic}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.question}}</td>
+			    
+			   
+				    <td>{{pendingreq_info.audiotape}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.beta}}</td>
+			    
+			    
+				    <td>{{pendingreq_info.dirichlet}}</td>
+                                 {% endfor %} 
+                            </tr>
+
+                    </tbody>
+                </table>
+		{% for pendingreq_info in pendingreq_info %}
+   
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.trustid}} ')" method = 'GET' type="button">Approve</button>
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.trustid}}')" method = 'GET' type="button">Deny</button>
+  
+	{% endfor %}	
+	</form>
+
+
+</div> <!-- /container -->
+{% endblock %}
