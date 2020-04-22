@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
-Sign Up
+Pending Request 
 {% endblock %}
 
 {% block styles %}
@@ -23,14 +23,20 @@ Sign Up
 {% endblock %}
 
 {% block content %}
+
+<h1> Pending Request Details </h1>
 <div class="container">
  <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Radilogy Images</th>
-                  <th>Compliance</th>
-               
-		 
+                  <th>Requestname</th>
+                  <th>Request Description</th>
+                  <th>Usage of data</th>
+		  <th>Storage of data </th>
+		  <th>How long data required</th>
+		  <th>How soon data required</th>
+		  <th>Type of data</th>
+		 <!-- <th>Risk Level</th> -->
 		  
                 </tr>
               </thead>
@@ -39,11 +45,15 @@ Sign Up
 			</thead>
                     <tbody>
 			    <tr> 
-				    {% for item in items %}
-
-				    <td>{{item[0]}}</td>
-                              	    <td>{{item[1]}}</td>
-				    
+				    {% for pendingreq_info in pendingreq_info %}
+				    <td>{{pendingreq_info.requestname}}</td>
+                              	    <td>{{pendingreq_info.requestDescription}}</td>
+				    <td>{{pendingreq_info.use}}</td>
+				    <td>{{pendingreq_info.store}}</td>
+				    <td>{{pendingreq_info.longdata}}</td>
+				    <td>{{pendingreq_info.soondata}}</td>
+				    <td>{{pendingreq_info.typeofdata}}</td>
+				    <!--  <td>{{pendingreq_info.risk_level}}</td> -->
                                  {% endfor %} 
                             </tr>
 
@@ -51,10 +61,10 @@ Sign Up
                 </table>
 		{% for pendingreq_info in pendingreq_info %}
    
-		<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.requestid}} ')" method = 'GET' type="button">Approve</button>
+	<!--	<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.requestid}} ')" method = 'GET' type="button">Approve</button>
 		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Deny</button>
   
-	{% endfor %}	
+		{% endfor %}	-->
 	</form>
 
 

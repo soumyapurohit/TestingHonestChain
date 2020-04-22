@@ -48,6 +48,7 @@ class Dataset(UserMixin, db.Model):
 
 class RequestForm(UserMixin, db.Model):
     requestid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    #ownerid = db.Column(db.Integer, primary_key = True, autoincrement = True)
     requestname = db.Column(db.String(40))
     requestDescription = db.Column(db.String(40))
     use = db.Column(db.String(40))
@@ -57,6 +58,7 @@ class RequestForm(UserMixin, db.Model):
     typeofdata = db.Column(db.String(40))
     status = db.Column(db.String(40))
     risk_level = db.Column(db.String(40))
+    #requestid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
     ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False) 
     datasetid =db.Column(db.Integer, db.ForeignKey('dataset.datasetid'), nullable=False)
     #requests = db.relationship('RequestForm', backref = 'user', lazy = True)
@@ -279,10 +281,10 @@ def dashboard():
     #conn.close()
     
 
-    pending_req = RequestForm.query.filter_by(status= 'pending').all()
+    pendingreq_info = RequestForm.query.filter_by(status= 'pending').all()
     approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
-    for i in pending_req:
+    for i in pendingreq_info:
         print("pending request id is",i.requestid)
 
     
@@ -293,12 +295,12 @@ def dashboard():
     elif(current_user.username == 'internaluser'):
         print('internal user dashboard')
         apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
-        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
         deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
-        for i in request_info: 
+        for i in pendingreq_info: 
             print("Request Id is ",i.requestid)
             print("Internal user approved request is ",i.requestname)
-        return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
+        return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
     else:
         print('external user dashboard')
         apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
@@ -307,7 +309,7 @@ def dashboard():
         deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
         for i in apprInternal_info:
             print("Internal user approved request is ",i.requestname)
-        return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, request_info=request_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
+        return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
 #@app.route('/dashboard_admin')
 #@login_required
 #def dashboad_admin():
@@ -442,7 +444,7 @@ def submithipaa():
      db.session.add(new_hipaa_request)
      db.session.commit()
     
-     request_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
+     pendingreq_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
      #for i in request_info:
     #     print("the trust id is", i.trustid)
      apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
@@ -453,14 +455,19 @@ def submithipaa():
      c.execute("SELECT * FROM trust_calc_form")
      data = cur.fetchall()         
      
+
+     pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
+     apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
+     deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status= 'denied').all()
+
      #cursor = db.execute('SELECT * FROM trust_calc_form')
      #items = cursor.fetchall()
      if(current_user.username == 'internaluser'):
         # return render_template('hipaa.html',items=items)
-         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
         
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
 
 
 @app.route('/print_items')
@@ -555,15 +562,15 @@ def submitrequest():
         
          #print("Here at 3",request.status)
      #print(requests.user.email)
-     request_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
+     pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
      apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
      deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status= 'denied').all() 
     # datasetid = resultset[0]
 
      if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, request_info=request_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
 
 
 @app.route('/viewmyreq/<req_id>', methods = ['GET',' POST'])
@@ -584,7 +591,7 @@ def viewmyreq(req_id):
 def viewpendingreq(req_id):
     
     pendingreq_info = RequestForm.query.filter_by(requestid=req_id, status = 'pending').all()
-    for i in reqinfo:
+    for i in pendingreq_info:
         print('The dataset id is',i.datasetid)
     #postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
     #cur.execute(postgreSQL_select_Query, [datasetprint])
@@ -605,7 +612,7 @@ def viewpendingreq(req_id):
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
 
 
-    return render_template('viewpenreq.html', name = current_user.username, pendingreq_info = pendingreq_info, approvedreq_info=approvedreq_info, denyreq_info=denyreq_info, record=record)
+    return render_template('viewpendingreq.html', name = current_user.username, pendingreq_info = pendingreq_info, record=record)
 # have to modify
 
 
@@ -632,7 +639,7 @@ def viewappInternal(req_id):
     rowcount = cur.rowcount
     print('row count', cur.rowcount)
     #for v in data:
-        #for column, value in v.items():
+        #for column, value in v.items()
             #print('{0}: {1}'.format(column, value))
 
     return render_template('viewdatauser.html',name = current_user.username, rowcount=rowcount, approvedreq_info = approvedreq_info, data = data)
