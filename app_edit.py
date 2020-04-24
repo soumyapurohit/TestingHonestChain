@@ -14,6 +14,7 @@ import os
 import psycopg2
 import json
 import sqlite3
+import requests
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 #from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -438,7 +439,11 @@ def submithipaa():
       #   wi = 0
      #wi = format(wi, '.2f')
      #print('dirichlet model is', wi)
-    
+     json_obj = '{"dataset_id": %s, "ds": %s, "cs": %s, "id": %s}' % (irb_id, resultset, compliance, current_user.id)
+     r_get = requests.get("http://3.81.13.0:3000/api/commodity")
+     print(r_get.status_code)
+     r_post = requests.post("http://3.81.13.0:3000/api/trade", json=json_obj)
+     print(r_post.status_code)
      status = 'pending'
      new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
      db.session.add(new_hipaa_request)
@@ -722,6 +727,10 @@ def request_form():
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
 
+@app.route('/')
+def bc():
+    return redirect("http://128.163.232.85:8080/test", code=302)
+
 @app.route('/enter_request',methods=['GET','POST'])
 def enter_request():
     form = CreateRequestForm()
@@ -748,6 +757,21 @@ def save_dialog():
     db.session.commit()
     return "Saved successfully"
     #return "Failed to save."
-    
+
+
+tasks = [
+{
+  "$class": "org.honestchain.User",
+  "userId": "1293",
+  "datasetId": "DS101",
+  "task_list": []
+}
+]
+
+@app.route('/tasks',methods=['GET'])
+def get_tasks():
+    return jsonify({'tasks': tasks})
+
+
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', debug=True)
