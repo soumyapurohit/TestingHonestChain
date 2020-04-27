@@ -31,7 +31,9 @@ login_manager.login_view = 'login'
 #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
 #cur = conn.cursor()
 #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
-conn = psycopg2.connect("host=hbcdm.cdm9kks3s0wa.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+#conn = psycopg2.connect("host=hbcdm.cdm9kks3s0wa.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+conn = psycopg2.connect("host=hbcdm.cpnsaiphh4ed.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+
 cur = conn.cursor()
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -439,12 +441,22 @@ def submithipaa():
       #   wi = 0
      #wi = format(wi, '.2f')
      #print('dirichlet model is', wi)
-     json_obj = '{"dataset_id": %s, "ds": %s, "cs": %s, "id": %s}' % (irb_id, resultset, compliance, current_user.id)
-     r_get = requests.get("http://3.81.13.0:3000/api/commodity")
-     print(r_get.status_code)
-     r_post = requests.post("http://3.81.13.0:3000/api/trade", json=json_obj)
-     print(r_post.status_code)
+     user_json_obj = '{"userId": %s, "datasetId": %s, "task_list": %s}' % (current_user.id, datasetId, tasklist)
+     task_json_obj = '{"task_id": %s, "inputcs": %s, "inputdr": %s, "decision": %s, "risk_level": %s, "reputation": %s, "user": %s}' % (task_id, compliance, dr, status, risk_level, reputation, user_json_obj)
+     #r_get = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
+     #print(r_get.status_code)
+     #r_post = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
+     #print(r_post.status_code)
      status = 'pending'
+     get_params = '{"userId":%s}' %s current_user.id
+     r_get = requests.get("http://3.81.13.0:3000/api/User", params=get_params)
+     if r_get.status_code == 200 and r_get.content != '[]':
+         r_post_task = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
+     else:
+         r_post_user = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
+         r_post_task = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
+
+
      new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
      db.session.add(new_hipaa_request)
      db.session.commit()
@@ -574,9 +586,11 @@ def submitrequest():
 
      if(current_user.username == 'internaluser'):
          return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+         #return redirect('jupyter notebook')
      elif(current_user.username == 'externaluser'):
          return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
 
+   # return redirect('jupyter notebook')
 
 @app.route('/viewmyreq/<req_id>', methods = ['GET',' POST'])
 @login_required
@@ -601,6 +615,7 @@ def viewpendingreq(req_id):
     #postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
     #cur.execute(postgreSQL_select_Query, [datasetprint])
     #resultset = cur.fetchone()
+    jupyter= RequestForm.query.filter_by(requestid=req_id).all()
     pendingreq_info = RequestForm.query.filter_by(requestid=req_id).all()
     for i in pendingreq_info:
         datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
@@ -617,10 +632,41 @@ def viewpendingreq(req_id):
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
 
 
-    return render_template('viewpendingreq.html', name = current_user.username, pendingreq_info = pendingreq_info, record=record)
+    return render_template('viewpendingreq.html', name = current_user.username,jupyter=jupyter, pendingreq_info = pendingreq_info, record=record)
 # have to modify
 
+@app.route('/jupyter', methods = ['GET',' POST'])
+@login_required
+def jupyter():
+    #return render_template('jupyter.html')
+    
 
+    #approvedreq_info = RequestForm.query.filter_by(status = 'approved').all()
+    #denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
+    #pending_req = RequestForm.query.filter_by(status= 'pending').all()
+    #for j in approvedreq_info:
+     #   print("Approved request is",j.requestname)
+
+    #for i in approvedreq_info:
+     #   datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
+    #for j in datasetinfo:
+     #   dataset_name = j.nameset
+    #pg_query = 'select * from data_catalog where dataset_name = %s'
+    #cur.execute(pg_query,[dataset_name])
+    #record = cur.fetchone()
+    #print("Result",record)
+    #cur.execute(record[4])
+    #data = cur.fetchall()
+    #rowcount = cur.rowcount
+    #print('row count', cur.rowcount)
+    #for v in data:
+        #for column, value in v.items()
+            #print('{0}: {1}'.format(column, value))
+
+    #return render_template('jupyter.html',name = current_user.username, approvedreq_info = approvedreq_info)
+# Have to modify
+     return redirect('http://127.0.0.1:8888/notebooks/Untitled%20Folder%201/Request_data.ipynb')
+     
 @app.route('/viewappInternal/<req_id>', methods = ['GET',' POST'])
 @login_required
 def viewappInternal(req_id):
