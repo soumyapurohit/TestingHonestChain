@@ -450,8 +450,8 @@ def submithipaa():
      risk_level='low'
      reputation=10
      user_id = current_user.id
-     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "user": %s}' % (dataset_id, risk_level, status, reputation, user)
-     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user)
+     #dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "user": %s}' % (dataset_id, risk_level, status, reputation, user)
+     #trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user)
      #r_get = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
      #print(r_get.status_code)
      #r_post = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
@@ -461,14 +461,16 @@ def submithipaa():
      get_data_params = '{"datasetId":%s}' % (dataset_id)
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
      data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
-     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "user": %s}' % (dataset_id, risk_level, status, reputation, user)
-     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user)
+     user_json = '{"userId": %s}' % (current_user.id)
+     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "last_requester": %s}' % (dataset_id, risk_level, status, reputation, user.content)
+     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user.content)
      if user.status_code != 200 or user.content == '[]':
-         r_post_user = requests.post("http://3.81.13.0:3000/explorer/User", json=user)
-     if data.status_code != 200 or data-content == '[]':
+         r_post_user = requests.post("http://3.81.13.0:3000/explorer/User", json=user_json)
+     if data.status_code != 200 or data.content == '[]':
          data_post = requests.post("http://3.81.13.0:3000/explorer/Dataset", json=dataset)
      trans_post = requests.post("http://3.81.13.0:3000/explorer/ChainTransaction", json=trans)
      result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     print(result_get.content)
          #r_post_task = requests.post("http://3.81.13.0:3000/explorer/TaskList", json=task_json_obj)
 
 
