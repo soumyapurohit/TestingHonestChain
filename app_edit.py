@@ -391,6 +391,7 @@ def submithipaa():
      postgreSQL_select_Query = "select * from data_policy_domain  where data_policy_domain.irb_number = %s"
      cur.execute(postgreSQL_select_Query, [irb_id])
      resultset = cur.fetchone()
+     dataset_id = resultset[0]
      print('resultset is',resultset)
      d = resultset[1:]
      print(d[0])
@@ -441,20 +442,34 @@ def submithipaa():
       #   wi = 0
      #wi = format(wi, '.2f')
      #print('dirichlet model is', wi)
-     user_json_obj = '{"userId": %s, "datasetId": %s, "task_list": %s}' % (current_user.id, datasetId, tasklist)
-     task_json_obj = '{"task_id": %s, "inputcs": %s, "inputdr": %s, "decision": %s, "risk_level": %s, "reputation": %s, "user": %s}' % (task_id, compliance, dr, status, risk_level, reputation, user_json_obj)
+     dataset_id = resultset[0]
+     tasklist =1
+     task_id=1
+     dr=0
+     status = 'pending'
+     risk_level='low'
+     reputation=10
+     user_id = current_user.id
+     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "user": %s}' % (dataset_id, risk_level, status, reputation, user)
+     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user)
      #r_get = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
      #print(r_get.status_code)
      #r_post = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
      #print(r_post.status_code)
      status = 'pending'
-     get_params = '{"userId":%s}' %s current_user.id
-     r_get = requests.get("http://3.81.13.0:3000/api/User", params=get_params)
-     if r_get.status_code == 200 and r_get.content != '[]':
-         r_post_task = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
-     else:
-         r_post_user = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
-         r_post_task = requests.post("http://3.81.13.0:3000/api/TaskList", json=task_json_obj)
+     get_user_params = '{"userId":%s}' % (current_user.id)
+     get_data_params = '{"datasetId":%s}' % (dataset_id)
+     user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
+     data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "user": %s}' % (dataset_id, risk_level, status, reputation, user)
+     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user)
+     if user.status_code != 200 or user.content == '[]':
+         r_post_user = requests.post("http://3.81.13.0:3000/explorer/User", json=user)
+     if data.status_code != 200 or data-content == '[]':
+         data_post = requests.post("http://3.81.13.0:3000/explorer/Dataset", json=dataset)
+     trans_post = requests.post("http://3.81.13.0:3000/explorer/ChainTransaction", json=trans)
+     result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+         #r_post_task = requests.post("http://3.81.13.0:3000/explorer/TaskList", json=task_json_obj)
 
 
      new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
@@ -495,7 +510,6 @@ def print_items():
     items=co.fetchall()
     return render_template('print_items.html', items=items)
 
-9
 
 @app.route('/identifierform', methods=['GET','POST'])
 def identifierform():
@@ -519,6 +533,7 @@ def submitrequest():
      postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
      cur.execute(postgreSQL_select_Query, [datasetprint])
      resultset = cur.fetchone()
+     dataset_id = resultset[0]
      print('The rows of selected dataset are',resultset)
      #print('datasetrisk',resultset[2])
      #print('User selected',datasetprint)
@@ -665,8 +680,9 @@ def jupyter():
 
     #return render_template('jupyter.html',name = current_user.username, approvedreq_info = approvedreq_info)
 # Have to modify
-     return redirect('http://127.0.0.1:8888/notebooks/Untitled%20Folder%201/Request_data.ipynb')
-     
+     #return redirect('http://127.0.0.1:8888/notebooks/Untitled%20Folder%201/Request_data.ipynb')
+     return redirect('https://colab.research.google.com/drive/1MMRUuABHO0T-gx17dx4Lo-7Dzu21oGue')
+
 @app.route('/viewappInternal/<req_id>', methods = ['GET',' POST'])
 @login_required
 def viewappInternal(req_id):
