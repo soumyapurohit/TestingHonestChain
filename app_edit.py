@@ -331,8 +331,11 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
+
 @app.route('/hipaaform/<requestid_domain>', methods=['GET','POST'])
 def hipaaform(requestid_domain):
+     
     print('in trust form')
     form = CreateTrustCalcForm()
     if form.validate_on_submit():
@@ -353,10 +356,16 @@ def pendrequest():
     return render_template('example2.html',form=form)
 
 @app.route('/submithipaaform/<requestid_domain>', methods=['GET','POST'])
-def submithipaa(requestid_domain):
+def submithipaaform(requestid_domain):
      print(current_user.username)
-     print('Domain id', requestid_domain)
-     form = CreateTrustCalcForm() 
+     print(requestid_domain)
+     #print('global variable value is',requestid_domain)
+     #print('Domain id', requestid_domain)
+     form = CreateTrustCalcForm()
+     if form.validate_on_submit:
+         print('Form is validated')
+         print(form.irb_id.data.irb_id)
+     print('form irb_id and form radiology image is',form.irb_id.data, form.radiology_imaging_reports.data.decision)
      irb_id = form.irb_id.data.irb_id
      #requestid = form.requestid.data.requestid   
      radiology_images = form.radiology_images.data.decision
@@ -380,11 +389,7 @@ def submithipaa(requestid_domain):
      audiotape = form.audiotape.data.decision
      #other = form.other.data.decision
      
-     #reqvar =  User.query.filter_by(ownerid=current_user.id)
-     reqvar = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending')
-     for i in reqvar:
-         print('Req values are', i)
-     print(requestid_domain)   
+     #reqvar =  User.query.filter_by(ownerid=current_user.id) 
      templist = [radiology_images, radiology_imaging_reports, ekg, progress_notes, history_phy, oper_report, path_report, lab_report, photographs, discharge_summaries, health_care_billing, consult, medication, emergency, dental, demographic, question, audiotape]
      if (current_user.username == 'internaluser'):
          userrole = 'internal_user'
@@ -469,6 +474,7 @@ def submithipaa(requestid_domain):
      #r_post = requests.post("http://3.81.13.0:3000/api/User", json=user_json_obj)
      #print(r_post.status_code)
      status = 'pending'
+     '''
      get_user_params = '{"userId":%s}' % (current_user.id)
      get_data_params = '{"datasetId":%s}' % (dataset_id)
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
@@ -489,9 +495,9 @@ def submithipaa(requestid_domain):
 
         
          #r_post_task = requests.post("http://3.81.13.0:3000/explorer/TaskList", json=task_json_obj)
+'''
 
-
-     new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
+     new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, requestid = requestid_domain, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
      db.session.add(new_hipaa_request)
      db.session.commit()
     
