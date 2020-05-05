@@ -13,10 +13,17 @@ Domain Form Entry
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
 {% endblock %}
 
+	<script>
+		 function submit(requestid_domain){
+                 var link = "{{url_for('submithipaaform', requestid_domain ='requestid_domain') }}".replace('requestid_domain', requestid_domain);
+                 window.location.href= link;
+                }
+
+	</script>
 {% block content %}
 <div class="container">
 
-  <form class="form-signin" method = "POST" action="/submithipaaform">
+	<form>
     <h2 class="form-signin-heading">Domain Form Entry</h2>
     {{form.hidden_tag() }}
     
@@ -43,12 +50,11 @@ Domain Form Entry
     
    
 </tr>
+  </form>   
+<input type ="button"  onclick= "submit('{{requestid_domain}}')"  class = "btn btn-success" id='{{requestid_domain}}' value="Submit" method="get">
 
-    
-    <button class="btn btn-lg btn-success btn-block" type="submit">Submit</button>
-  </form>
-
-</div> <!-- /container -->
+   
+  <div> <!-- /container -->
 
 
 

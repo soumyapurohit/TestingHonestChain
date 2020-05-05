@@ -42,6 +42,13 @@ Dashboard
 			var link = "{{url_for('viewdenied', req_id ='reqid') }}".replace('reqid', reqid);
 			window.location.href= link;
                 }
+
+		function domainform(requestid_domain){
+
+			var link = "{{url_for('hipaaform', requestid_domain ='requestid_domain') }}".replace('requestid_domain', requestid_domain);
+                        window.location.href= link;
+
+		}
 </script>
 <link rel="stylesheet" href="{{url_for('.static', filename='dashboard.css')}}">
 
@@ -104,10 +111,10 @@ Dashboard
                <h1 class="page-header">Welcome , {{name}}</h1>
 		<form action =" {{url_for('request_form') }} " method ="get">
 			<input type = "submit"class = "btn btn-success" value="Request Form">
-		</form>
-		<form action =" {{url_for('hipaaform') }} " method ="get">
-                        <input type = "submit"class = "btn btn-success" value="Domain Form">
-                </form>
+		</form>	
+		
+		<input type ="button"  onclick= "domainform('{{requestid_domain}}')"  class = "btn btn-success" id='{{requestid_domain}}' value="Domain Form" method="get">
+                
 		<!--<form action =" {{url_for('identifierform') }} " method ="get">
                         <input type = "submit"class = "btn btn-info" value="Identifier Form Entry">
 		</form> -->

@@ -87,6 +87,7 @@ class TrustChoice(UserMixin, db.Model):
 
 class TrustCalcForm(UserMixin, db.Model):
     trustid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    #requestid = db.Column(db.Integer, db.ForeignKey('request_form.requestid'), nullable=False)
     radiology_images = db.Column(db.String(10))
     radiology_imaging_reports = db.Column(db.String(10))
     ekg = db.Column(db.String(10))
@@ -116,6 +117,7 @@ class TrustCalcForm(UserMixin, db.Model):
     status = db.Column(db.String(10))
     ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
    # trustchoiceid = db.Column(db.Integer, db.ForeignKey('trust_choice.trustchoiceid'), nullable=False)
+    requestid= db.Column(db.Integer, db.ForeignKey('request_form.requestid'),nullable=False)
 
 class IdentifierCalcForm(UserMixin, db.Model):
     identifier = db.Column(db.Integer, primary_key = True, autoincrement = True)
@@ -137,7 +139,7 @@ class IdentifierCalcForm(UserMixin, db.Model):
     photographic_image = db.Column(db.String(10))
     any_other_characteristics = db.Column(db.String(10))
     ownerid= db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
-
+    
 #class SelectFieldtypedata(db.Model):
 #    datatype = db.Column(db.String(40))
 
@@ -147,6 +149,10 @@ class IdentifierCalcForm(UserMixin, db.Model):
 
 def choice_irb():
     return IrbInfo.query
+
+
+def choice_request():
+    return RequestForm.query
 
 def choice_trustcalc():
     return TrustChoice.query
@@ -196,6 +202,7 @@ class CreateRequestForm(FlaskForm):
 class CreateTrustCalcForm(FlaskForm):
     #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])
      irb_id = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
+     #requestid = QuerySelectField(query_factory=choice_request, allow_blank=True, get_label = 'requestid')
      radiology_images = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      radiology_imaging_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      ekg = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
@@ -318,21 +325,21 @@ def dashboard():
 #def dashboad_admin():
  #   return render_template('dashboard_admin.html', name = current_user.username)
 
-@app.route('/logout')
+@app.route('/logout') 
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/hipaaform', methods=['GET','POST'])
-def hipaaform():
+@app.route('/hipaaform/<requestid_domain>', methods=['GET','POST'])
+def hipaaform(requestid_domain):
     print('in trust form')
     form = CreateTrustCalcForm()
     if form.validate_on_submit():
         print('Form validated')
     else:
         print(form.errors)
-    return render_template('example2.html',form=form)
+    return render_template('example2.html',form=form,requestid_domain=requestid_domain)
 
 
 @app.route('/pendrequest', methods=['GET','POST'])
@@ -345,12 +352,13 @@ def pendrequest():
         print(form.errors)
     return render_template('example2.html',form=form)
 
-@app.route('/submithipaaform', methods=['GET','POST'])
-def submithipaa():
+@app.route('/submithipaaform/<requestid_domain>', methods=['GET','POST'])
+def submithipaa(requestid_domain):
      print(current_user.username)
+     print('Domain id', requestid_domain)
      form = CreateTrustCalcForm() 
      irb_id = form.irb_id.data.irb_id
-
+     #requestid = form.requestid.data.requestid   
      radiology_images = form.radiology_images.data.decision
      radiology_imaging_reports = form.radiology_imaging_reports.data.decision
      ekg = form.ekg.data.decision
@@ -372,7 +380,11 @@ def submithipaa():
      audiotape = form.audiotape.data.decision
      #other = form.other.data.decision
      
-     
+     #reqvar =  User.query.filter_by(ownerid=current_user.id)
+     reqvar = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending')
+     for i in reqvar:
+         print('Req values are', i)
+     print(requestid_domain)   
      templist = [radiology_images, radiology_imaging_reports, ekg, progress_notes, history_phy, oper_report, path_report, lab_report, photographs, discharge_summaries, health_care_billing, consult, medication, emergency, dental, demographic, question, audiotape]
      if (current_user.username == 'internaluser'):
          userrole = 'internal_user'
@@ -442,7 +454,7 @@ def submithipaa():
       #   wi = 0
      #wi = format(wi, '.2f')
      #print('dirichlet model is', wi)
-     dataset_id = resultset[0]
+     dataset_id = resultset[1]
      tasklist =1
      task_id=1
      dr=0
@@ -461,16 +473,21 @@ def submithipaa():
      get_data_params = '{"datasetId":%s}' % (dataset_id)
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
      data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     print(data)
      user_json = '{"userId": %s}' % (current_user.id)
-     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "last_requester": %s}' % (dataset_id, risk_level, status, reputation, user.content)
-     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user.content)
+     dataset = '{"dataset_id": %s, "risk_level": %s, "decision": %s, "reputation": %s, "last_requester": %s}' % (dataset_id, risk_level, status, reputation, "resources:org.honestchain.User#" + str(current_user.id))
+     #trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset, user.content)
      if user.status_code != 200 or user.content == '[]':
          r_post_user = requests.post("http://3.81.13.0:3000/explorer/User", json=user_json)
      if data.status_code != 200 or data.content == '[]':
          data_post = requests.post("http://3.81.13.0:3000/explorer/Dataset", json=dataset)
+     trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, "resources:org.honestchain.Dataset#" + str(dataset_id), "resources:org.honestchain.User#" + str(current_user.id))
      trans_post = requests.post("http://3.81.13.0:3000/explorer/ChainTransaction", json=trans)
      result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
      print(result_get.content)
+    # print(result_get.content.decision)
+
+        
          #r_post_task = requests.post("http://3.81.13.0:3000/explorer/TaskList", json=task_json_obj)
 
 
@@ -535,7 +552,7 @@ def submitrequest():
      postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
      cur.execute(postgreSQL_select_Query, [datasetprint])
      resultset = cur.fetchone()
-     dataset_id = resultset[0]
+     #dataset_id = resultset[0]
      print('The rows of selected dataset are',resultset)
      #print('datasetrisk',resultset[2])
      #print('User selected',datasetprint)
@@ -585,9 +602,9 @@ def submitrequest():
 
      new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.use.data, store=form.store.data, longdata = form.longdata.data, soondata = form.soondata.data, typeofdata = form.typeofdata.data, status = 'pending')
      db.session.add(new_request)
-     
+    # print(new_request.requestid)
      db.session.commit()
-
+     print(new_request.requestid)
      #request_info = RequestForm.query.filter_by( ownerid = current_user.id).all()
      #for request in request_info:
       #   requestObject = { 'status'  : request.status,
@@ -602,10 +619,10 @@ def submitrequest():
     # datasetid = resultset[0]
 
      if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid)
          #return redirect('jupyter notebook')
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info)
+         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid)
 
    # return redirect('jupyter notebook')
 
