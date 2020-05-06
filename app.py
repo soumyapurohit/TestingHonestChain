@@ -29,7 +29,9 @@ login_manager.login_view = 'login'
 #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
 #cur = conn.cursor()
 #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
-conn = psycopg2.connect("host=hbcdm.cdm9kks3s0wa.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+#conn = psycopg2.connect("host=hbcdm.cdm9kks3s0wa.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+conn = psycopg2.connect("host=hbcdm.cpnsaiphh4ed.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
+
 cur = conn.cursor()
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -345,9 +347,11 @@ def pendrequest():
 @app.route('/submithipaaform', methods=['GET','POST'])
 def submithipaa():
      print(current_user.username)
-     form = CreateTrustCalcForm() 
+     form = CreateTrustCalcForm()
+     
      irb_id = form.irb_id.data.irb_id
-
+     print(type(form.irb_id))
+     print(type(form.irb_id.data))
      radiology_images = form.radiology_images.data.decision
      radiology_imaging_reports = form.radiology_imaging_reports.data.decision
      ekg = form.ekg.data.decision

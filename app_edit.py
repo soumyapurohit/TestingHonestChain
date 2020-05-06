@@ -5,6 +5,8 @@ from decimal import *
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, RadioField, SelectField
 from wtforms.validators import InputRequired, Email, Length
+from flask_wtf.file import FileField
+#from werkzeug import secure_filename
 from flask import flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
@@ -200,6 +202,7 @@ class CreateRequestForm(FlaskForm):
     typeofdata=StringField('What type of data would you like to receive', validators=[InputRequired(), Length(min=4, max=40)])
 
 class CreateTrustCalcForm(FlaskForm):
+     file=FileField()
     #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])
      irb_id = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
      #requestid = QuerySelectField(query_factory=choice_request, allow_blank=True, get_label = 'requestid')
@@ -353,11 +356,13 @@ def pendrequest():
     return render_template('example2.html',form=form)
 
 @app.route('/submithipaaform/<requestid_domain>', methods=['GET','POST'])
-def submithipaa(requestid_domain):
-     print(current_user.username)
-     print('Domain id', requestid_domain)
-     form = CreateTrustCalcForm() 
-     irb_id = form.irb_id.data.irb_id
+def submithipaaform(requestid_domain):
+     #print(current_user.username)
+     #print('Domain id', requestid_domain)
+     
+     form = CreateTrustCalcForm()
+     
+     irb_id = form.file.data.irb_id
      #requestid = form.requestid.data.requestid   
      radiology_images = form.radiology_images.data.decision
      radiology_imaging_reports = form.radiology_imaging_reports.data.decision
@@ -380,16 +385,16 @@ def submithipaa(requestid_domain):
      audiotape = form.audiotape.data.decision
      #other = form.other.data.decision
      
-     #reqvar =  User.query.filter_by(ownerid=current_user.id)
+     reqvar =  User.query.filter_by(ownerid=current_user.id)
      reqvar = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending')
      for i in reqvar:
          print('Req values are', i)
-     print(requestid_domain)   
+         print(requestid_domain)   
      templist = [radiology_images, radiology_imaging_reports, ekg, progress_notes, history_phy, oper_report, path_report, lab_report, photographs, discharge_summaries, health_care_billing, consult, medication, emergency, dental, demographic, question, audiotape]
      if (current_user.username == 'internaluser'):
-         userrole = 'internal_user'
+          userrole = 'internal_user'
      elif (current_user.username == 'externaluser'):
-         userrole = 'external_user'
+          userrole = 'external_user'
 
          
      #item_select_query = "select itemunique from item_info  where itemname = radiology_images";
@@ -403,7 +408,7 @@ def submithipaa(requestid_domain):
      postgreSQL_select_Query = "select * from data_policy_domain  where data_policy_domain.irb_number = %s"
      cur.execute(postgreSQL_select_Query, [irb_id])
      resultset = cur.fetchone()
-     dataset_id = resultset[0]
+     #dataset_id = resultset[0]
      print('resultset is',resultset)
      d = resultset[1:]
      print(d[0])
@@ -498,7 +503,7 @@ def submithipaa(requestid_domain):
      pendingreq_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
      #for i in request_info:
     #     print("the trust id is", i.trustid)
-     apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
+     apprInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status = 'approved').all() 
      deniedInternal_info = TrustCalcForm.query.filter_by(ownerid=current_user.id, status= 'denied').all()
      
      con=sqlite3.connect("database.db")
@@ -506,20 +511,21 @@ def submithipaa(requestid_domain):
      c.execute("SELECT * FROM trust_calc_form")
      data = cur.fetchall()         
      
-
      pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
      apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
      deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status= 'denied').all()
+     print('Process Working')
 
      #cursor = db.execute('SELECT * FROM trust_calc_form')
      #items = cursor.fetchall()
      if(current_user.username == 'internaluser'):
         # return render_template('hipaa.html',items=items)
-         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,requestid_domain=requestid_domain)
         
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
-
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,requestid_domain=requestid_domain)
+    
+         return 'OK'
 
 @app.route('/print_items')
 def print_items():
@@ -549,6 +555,7 @@ def submitrequest():
      #if form.validate_on_submit()
 
      datasetprint=form.datasetname.data.nameset
+     print(type(form.datasetname.data))
      postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
      cur.execute(postgreSQL_select_Query, [datasetprint])
      resultset = cur.fetchone()
