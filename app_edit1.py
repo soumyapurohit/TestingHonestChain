@@ -187,6 +187,13 @@ class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=6, max=80)])
 
+class FeedbackForm(FlaskForm):
+    receival = StringField('Did you receive the data', validators=[InputRequired(), Length(min=4, max=45)])
+    Input =StringField('Are you satisfied with the data', validators=[InputRequired(), Length(min=4, max=40)])
+    time_taken=StringField('How much time did it take to receive the data', validators=[InputRequired(), Length(min=4, max=40)])
+    feedback_user=StringField('Rate the data provider with : positive,negative,neutral', validators=[InputRequired(), Length(min=4, max=40)])
+
+
 class CreateRequestForm(FlaskForm):
     requestname = StringField('Title', validators=[InputRequired(), Length(min=4, max=15)])
     requestDescription =  StringField('Description', validators=[InputRequired(), Length(min=4, max=40)])
@@ -461,8 +468,8 @@ def submithipaaform(requestid_domain):
      #print('dirichlet model is', wi)
      cur.execute('SELECT dataset_id FROM data_catalog')
      resultset = cur.fetchall()   
-     dataset_id1 = resultset[0]
-     print(resultset[0])
+     dataset_id1 = resultset[9]
+     print(resultset[1])
      #tasklist =1
      #task_id=1
      dr=0
@@ -481,48 +488,63 @@ def submithipaaform(requestid_domain):
      print(current_user.username)
      print(current_user.id)
      get_user_params = {"userId":current_user.id }
-     get_data_params = {"datasetId":dataset_id1}
-     get_trans_params = {"request_id":requestid_domain}
+     get_data_params = {"requestid":str(requestid_domain)}
+     #get_trans_params = {"request_id":requestid_domain}
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
      data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
-     trans = requests.get("http://3.81.13.0:3000/api/ChainTransaction",params=get_trans_params)
-     print(trans.content)
-     print(trans.status_code)
-     print(data.content)
-     print(data.status_code)
-     print(user.content)
-     print(user.status_code)
-     print(requestid_domain)
+     #trans = requests.get("http://3.81.13.0:3000/api/ChainTransaction",params=get_trans_params)
+     #print(trans.content)
+     #print(trans.status_code)
+     #print(data.content)
+     #print(data.status_code)
+     #print(user.content)
+     #print(user.status_code)
+     #print(requestid_domain)
      #user_json = '{"userId": %s, "username" : %s}' % (current_user.id,current_user.username)
      user_json = {"userId": current_user.id, "username" : current_user.username}
      #a=json.loads(user_json)
      #print(user_json)
-     dataset_json = {"datasetId": dataset_id1, "risk_level": risk_level, "decision": decision, "reputation": reputation,"last_requester" :'[user.content]'}
+     dataset_json = {"datasetId" : dataset_id1,"risk_level": risk_level, "decision": decision, "reputation": reputation,"last_requester" :"resource:org.honestchain.User#" +str(current_user.username) }
      #dataset_json = {"datasetId": dataset_id1}   
-     print(dataset_json)
+     print("Dataset details",dataset_json)
      #trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset_json, user.content)
      #print(dataset)
      #print(trans)
      if user.status_code == '200' or user.content == '[]':
          r_post_user = requests.post("http://3.81.13.0:3000/api/User", json=user_json)
-         print(user.content)
+     print(user.content)
      if data.status_code == '200' or data.content == '[]':
-         data_post = requests.post("http://3.81.13.0:3000/api/Dataset", json=dataset_json)
-         print(data.content)
+         data = requests.post("http://3.81.13.0:3000/api/Dataset", json=dataset_json)
+     print(data.content)
     # trans = '{"request_id": %s, "inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (requestid_domain,compliance, dr, data.content , "resources:org.honestchain.User#" +str(current_user.id))
-     #if trans.status_code == '200' or trans.content == '[]': 
-     trans_json = {"requestid":requestid_domain, "inputcs": compliance, "inputdr": dr, "dataset": '[data.content]' , "user":'[user.content]'} 
-     if trans.status_code == '200' or trans.content == '[]':
-         trans_post = requests.post("http://3.81.13.0:3000/api/ChainTransaction", json=trans_json)
-         print(trans.content)
+     #if trans.status_code == '200' or trans.content == '[]': i
+     trans_json = {"requestid": requestid_domain,"datasetId": dataset_id1, "inputcs": compliance, "inputdr": dr, "dataset": "resource:org.honestchain.Dataset#"+ dataset_id1[0], "user" : "resource:org.honestchain.User#" +str(current_user.username)}
+     print("Trans details" , trans_json)
+     #if trans.status_code == '200' or trans.content == '[]':
+     trans_post = requests.post("http://3.81.13.0:3000/api/ChainTransaction", json=trans_json)
+     print("Posted content",trans_post.content)
      result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
-     print(result_get.content)
+     print("Final Result",result_get.content)
      #print(trans_post.content)
      #print(result_get.content.decision)
         
         # r_post_task = requests.post("http://3.81.13.0:3000/explorer/TaskList", json=task_json_obj)
+     #    a =request.form['data']
+    #print type(a)
+    #a=a.encode("utf-8")
+    #print type(a)
+     b=result_get.content
+     b=b.encode("utf-8")
+     dic =json.loads(b)
+     print type(dic)
+     print dic
+     #text = dic[int(risk_level)]
+     #print type(text)
+     #print text
+   
+   
 
-
+        
      new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, requestid = requestid_domain, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
      db.session.add(new_hipaa_request)
      db.session.commit()
@@ -738,7 +760,7 @@ def jupyter():
 @login_required
 def viewappInternal(req_id):
     
-    approvedreq_info = RequestForm.query.filter_by(status = 'approved').all()
+    approvedreq_info = RequestForm.query.filter_by(status = 'pending').all()
     #denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
     #pending_req = RequestForm.query.filter_by(status= 'pending').all()
     for j in approvedreq_info:
@@ -839,6 +861,16 @@ def request_form():
     form = CreateRequestForm()
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
+
+
+@app.route('/feedbackform',methods=['GET','POST'])
+def feedback_form():
+    form = FeedbackForm()
+    return render_template('feedback.html',form=form)
+
+@app.route('/submitfeedbackform',methods=['GET','POST'])
+def submitfeedbackform():
+    return render_template('dashboard.html')
 
 @app.route('/')
 def bc():

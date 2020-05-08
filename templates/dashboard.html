@@ -115,9 +115,9 @@ Dashboard
 		
 		<input type ="button"  onclick= "domainform('{{requestid_domain}}')"  class = "btn btn-success" id='{{requestid_domain}}' value="Domain Form" method="get">
                 
-		<!--<form action =" {{url_for('identifierform') }} " method ="get">
-                        <input type = "submit"class = "btn btn-info" value="Identifier Form Entry">
-		</form> -->
+		<form action =" {{url_for('feedback_form') }} " method ="get">
+                        <input type = "submit"class = "btn btn-success" value="Feedback Form">
+		</form> 
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
           <h2 class="sub-header">Pending Requests</h2>
           <div class="table-responsive">
