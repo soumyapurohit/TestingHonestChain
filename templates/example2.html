@@ -14,8 +14,8 @@ Domain Form Entry
 
 
 	<script>
-		 function submitdomain(requestid_domain){
-                 var link = "{{url_for('submithipaaform', requestid_domain ='requestid_domain') }}".replace('requestid_domain', requestid_domain);
+		 function submitdomain(requestid_domain,dataset_id_final,dataset_risk){
+                 var link = "{{url_for('submithipaaform', requestid_domain ='requestid_domain',dataset_id_final='dataset_id_final',dataset_risk='dataset_risk') }}".replace('requestid_domain', requestid_domain);
                  window.location.href= link;
                 }
 
@@ -24,7 +24,7 @@ Domain Form Entry
 {% block content %}
 <div class="container">
 
-	<form  action ="{{ url_for('submithipaaform', requestid_domain=requestid_domain) }} " method ="POST">
+	<form  action ="{{ url_for('submithipaaform', requestid_domain=requestid_domain,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk) }} " method ="POST">
     <h2 class="form-signin-heading">Domain Form Entry</h2>
     {{form.hidden_tag() }}
     

@@ -8,11 +8,9 @@ Dashboard
 {% block styles %}
 {{super()}}
 <script>
-	function view(reqid){
-		document.getElementById(reqid).innerHTML = reqid;
+	//function view(reqid){
+		//document.getElementById(reqid).innerHTML = reqid;
 		//reqidnew  = "reqid"
-		var link = "{{url_for('viewmyreq', req_id ='reqid') }}".replace('reqid', reqid);
-		window.location.href= link;
 		//var base_url = window.location.origin;
 		//var page_url = '/viewmyreq';
 		//var parameters = '?req_id=' +reqid;
@@ -24,7 +22,7 @@ Dashboard
 		//var link  = page_url + parameters;
 		//window.location.href= link;
 		//document.getElementById('req').innerHTML = reqid;
-	}
+	//}
 	//$('req').onclick(view()
 	//	{alert("hello world"); })
 	        function viewappInternal(reqid){
@@ -33,12 +31,24 @@ Dashboard
                 var link = "{{url_for('viewappInternal', req_id ='reqid') }}".replace('reqid', reqid);
                 window.location.href= link;
 		}
-
+		function viewpendingreq(reqid){
+                document.getElementById(reqid).innerHTML = reqid;
+                //reqidnew  = "reqid"
+                var link = "{{url_for('viewpendingreq', req_id ='reqid') }}".replace('reqid', reqid);
+                window.location.href= link;
+		}
                 function viewdenied(reqid){
 			//document.getElementById(reqid).innerHTML = reqid;
 			var link = "{{url_for('viewdenied', req_id ='reqid') }}".replace('reqid', reqid);
 			window.location.href= link;
                 }
+
+		function domainform(requestid_domain){
+
+			var link = "{{url_for('hipaaform', requestid_domain ='requestid_domain') }}".replace('requestid_domain', requestid_domain);
+                        window.location.href= link;
+
+		}
 </script>
 <link rel="stylesheet" href="{{url_for('.static', filename='dashboard.css')}}">
 
@@ -58,14 +68,14 @@ Dashboard
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="#">Honest Chain</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-            <li><a href=" {{url_for('logout') }}"></a></li>
+	    <li><a href=" {{url_for('logout') }}">Logout</a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <input type="text" class="form-control" placeholder="Search...">
@@ -90,19 +100,26 @@ Dashboard
             <li><a href="">Another nav item</a></li>
             <li><a href="">More navigation</a></li>
           </ul>
-          <ul class="nav nav-sidebar">
-            <li><a href="">Nav item again</a></li>
+	  <ul class="nav nav-sidebar"> 
+	  <li><a href="">Nav item again</a></li>
             <li><a href="">One more nav</a></li>
             <li><a href="">Another nav item</a></li>
           </ul>
-	</div>   -->
+	</div>
+    -->
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                <h1 class="page-header">Welcome , {{name}}</h1>
-		<form action =" {{url_for('request') }} " method ="get">
-			<input type = "submit"class = "btn btn-info" value="New Request">
-		</form>
+		<form action =" {{url_for('request_form') }} " method ="get">
+			<input type = "submit"class = "btn btn-success" value="Request Form">
+		</form>	
+		
+		<input type ="button"  onclick= "domainform('{{requestid_domain}}')"  class = "btn btn-success" id='{{requestid_domain}}' value="Domain Form" method="get">
+                
+		<form action =" {{url_for('feedback_form') }} " method ="get">
+                        <input type = "submit"class = "btn btn-success" value="Feedback Form">
+		</form> 
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
-          <h2 class="sub-header">Pending Request</h2>
+          <h2 class="sub-header">Pending Requests</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -113,65 +130,63 @@ Dashboard
                 </tr>
               </thead>
               <tbody>
-                <tr>
-			{% for new_request in request_info %}
-			<td><a href = "#"  onclick = "view('{{new_request.requestid}}')" id = '{{new_request.requestid}}'  method ="GET">{{new_request.requestid}}</a></td>
-			<td id = "requestname">{{new_request.requestname}}</td>
-			<td>{{new_request.requestDescription}}</td> 
+  			<tr>
+			{% for pendingreq_info in pendingreq_info %}
+			<td><a href = "#"  onclick = "viewpendingreq('{{pendingreq_info.requestid}}')" id = '{{pendingreq_info.requestid}}'  method ="GET">{{pendingreq_info.requestid}}</a></td>
+			<td id = "requestname">{{pendingreq_info.requestname}}</td>
+			<td>{{pendingreq_info.requestDescription}}</td> 
     			
                 </tr>
 		{% endfor %}
               </tbody>
             </table>
-            <h2 class="sub-header">Approved Request</h2>
+            <h2 class="sub-header">Approved Requests</h2>
+
+	   	<h4>Approved requests can be checked in Blockchain </h4>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
-                    <tr>
+                   <!-- <tr>
                         <th>ID</th>
                         <th>Request name</th>
                         <th>Description</th>
-                    </tr>
+		   </tr>   -->
                     </thead>
-                    <tbody>
-                            <tr>
+		    <tbody> 
+                    <!--        <tr>
 				    {% for apprInternal_info in apprInternal_info %}
 				    <td><a href = "#"  onclick = "viewappInternal('{{apprInternal_info.requestid}}')" id = '{{apprInternal_info.requestid}}'  method ="GET">{{apprInternal_info.requestid}}</a></td>
 				    <td id = "requestname">{{apprInternal_info.requestname}}</td>
                                     <td>{{apprInternal_info.requestDescription}}</td>
                                     
-                            </tr>
-			    {% endfor %}
+		    </tr>
+		    {% endfor %}  -->
                     </tbody>
                 </table>
             </div>
-            <h2 class="sub-header">Denied</h2>
+            <h2 class="sub-header">Denied Requests</h2>
+	    <h4>Denied requests can be checked in Blockchain </h4>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
-                    <tr>
+                   <!-- <tr>
 			    <th>ID</th>
 			<th>Request Name</th>
                         <th>Description</th>
-                    </tr>
+		   </tr> -->
                     </thead>
                     <tbody>
-                            <tr>
+                         <!--   <tr>
                                     {% for deniedInternal_info in deniedInternal_info %}
-                                    <td><a href = "#" id = '{{deniedInternal_info.requestid}}'  method ="GET">{{deniedInternal_info.requestid}}</a></td>
+				    <td><a href = "#"  id = '{{deniedInternal_info.requestid}}' method ="GET">{{deniedInternal_info.requestid}}</a></td>
                                     <td id = "requestname">{{deniedInternal_info.requestname}}</td>
                                     <td>{{deniedInternal_info.requestDescription}}</td>
                                    
                             </tr>
-			    {% endfor %}
+			    {% endfor %} -->
                     </tbody>
                 </table>
             </div>
       </div>
     </div>
 {% endblock %}
-                                                                                                                                                                                          
-                                                                                                                                                                                         
-                                                                                                                                                                                        
-                                                                                                                                                                                         
-                                                                                                                                                                                         

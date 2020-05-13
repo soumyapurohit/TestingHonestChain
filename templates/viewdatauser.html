@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
-View Data
+Pending Request 
 {% endblock %}
 
 {% block styles %}
@@ -18,44 +18,70 @@ View Data
                 var link = "{{url_for('denyreq', req_id ='reqid') }}".replace('reqid', reqid);
                 window.location.href= link;
         }
+	function jupyter(reqid){
+
+                var link = "{{url_for('jupyter', req_id ='reqid') }}".replace('reqid', reqid);
+                window.location.href= link;
+        }
+	
 </script>
 <link rel="stylesheet" href="{{url_for('.static', filename='signin.css')}}">
 {% endblock %}
 
 {% block content %}
+
+<h1> Pending Request Details </h1>
 <div class="container">
  <table class="table table-striped">
               <thead>
-               
-			<th>
-			<tr><td>S.No</td>
-			<td>Description</td>
-		</tr>
-			</th>
+                <tr>
+                  <th>Requestname</th>
+                  <th>Request Description</th>
+                  <th>Usage of data</th>
+		  <th>Storage of data </th>
+		  <th>How long data required</th>
+		  <th>How soon data required</th>
+		  <th>Type of data</th>
+		  <!-- <th>Data Visual</th>-->
+		 <!-- <th>Risk Level</th> -->
 		  
-                
+                </tr>
               </thead>
-             
+              <tbody>
+                
+			</thead>
                     <tbody>
-			     
-			 {% for i in range(0,rowcount) %}
-			 <tr>
-				    <td>{{i}}</td>
-				    <td>{{data[i]}}</td>
-			 </tr>
-                         {% endfor %} 
-			    
+			    <tr> 
+				    {% for pendingreq_info in pendingreq_info %}
+				    <td>{{pendingreq_info.requestname}}</td>
+                              	    <td>{{pendingreq_info.requestDescription}}</td>
+				    <td>{{pendingreq_info.use}}</td>
+				    <td>{{pendingreq_info.store}}</td>
+				    <td>{{pendingreq_info.longdata}}</td>
+				    <td>{{pendingreq_info.soondata}}</td>
+				    <td>{{pendingreq_info.typeofdata}}</td>
+				    <!--  <td>{{pendingreq_info.risk_level}}</td> -->
+				    {% for apprInternal_info in apprInternal_info %}
+                                    <td><a href = "#"  onclick = "jupyter('{{apprInternal_info.requestid}}')" id = '{{apprInternal_info.requestid}}'  method ="GET">{{apprInternal_info.requestid}}</a></td>
+	  
+				    {% endfor %} 
+				    {% endfor %}
+                            </tr>
 
                     </tbody>
                 </table>
-		{% for pendingreq_info in pendingreq_info %}
+	<!--	{% for pendingreq_info in pendingreq_info %}
    
 		<button class="btn btn-lg btn-primary btn-block"  onclick = "appReq(' {{pendingreq_info.requestid}} ')" method = 'GET' type="button">Approve</button>
 		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Deny</button>
   
-	{% endfor %}	
-	</form>
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Deny</button>
+	
+		{% endfor %}-->
 
+		<button class="btn btn-lg btn-primary btn-block"  onclick = "jupyter('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Data Visual</button>
+	
 
 </div> <!-- /container -->
 {% endblock %}
+

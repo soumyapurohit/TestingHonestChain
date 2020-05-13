@@ -15,6 +15,7 @@ import psycopg2
 import json
 import sqlite3
 import requests
+import csv
 
 from wtforms_sqlalchemy.fields import QuerySelectField
 #from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -270,7 +271,7 @@ def signup():
 def intro():
     return render_template('intro.html')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET','POST'])
 @login_required
 def dashboard():
     #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
@@ -301,6 +302,7 @@ def dashboard():
     pendingreq_info = RequestForm.query.filter_by(status= 'pending').all()
     approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
+    #b=b
     for i in pendingreq_info:
         print("pending request id is",i.requestid)
 
@@ -340,16 +342,17 @@ def logout():
 
 
 
-@app.route('/hipaaform/<requestid_domain>', methods=['GET','POST'])
-def hipaaform(requestid_domain):
-     
+@app.route('/hipaaform/<requestid_domain>/<dataset_id_final>/<dataset_risk>', methods=['GET','POST'])
+def hipaaform(requestid_domain,dataset_id_final,dataset_risk):
+    print(requestid_domain)
+    print(dataset_id_final)     
     print('in trust form')
     form = CreateTrustCalcForm()
     if form.validate_on_submit():
         print('Form validated')
     else:
         print(form.errors)
-    return render_template('example2.html',form=form,requestid_domain=requestid_domain)
+    return render_template('example2.html',form=form,requestid_domain=requestid_domain,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
 
 
 @app.route('/pendrequest', methods=['GET','POST'])
@@ -362,8 +365,8 @@ def pendrequest():
         print(form.errors)
     return render_template('example2.html',form=form)
 
-@app.route('/submithipaaform/<requestid_domain>', methods=['GET','POST'])
-def submithipaaform(requestid_domain):
+@app.route('/submithipaaform/<requestid_domain>/<dataset_id_final>/<dataset_risk>', methods=['GET','POST'])
+def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      print(current_user.username)
      print(requestid_domain)
      #print('global variable value is',requestid_domain)
@@ -415,8 +418,8 @@ def submithipaaform(requestid_domain):
      postgreSQL_select_Query = "select * from data_policy_domain  where data_policy_domain.irb_number = %s"
      cur.execute(postgreSQL_select_Query, [irb_id])
      resultset = cur.fetchone()
-     dataset_id = resultset[0]
-     print('resultset is',resultset)
+     #dataset_id = resultset[0]
+     #print('resultset is',resultset)
      d = resultset[1:]
      print(d[0])
      si=0      
@@ -466,13 +469,27 @@ def submithipaaform(requestid_domain):
       #   wi = 0
      #wi = format(wi, '.2f')
      #print('dirichlet model is', wi)
+     
      cur.execute('SELECT dataset_id FROM data_catalog')
      resultset = cur.fetchall()   
-     dataset_id1 = resultset[9]
-     print(resultset[1])
+     dataset_id1 = dataset_id_final
+     print("Dataset id value is", dataset_id1)
+
+
+     print("Request id value is ", str(requestid_domain))
+     #db.session.execute("select requestname from request_form where requestid=requestid")     
+     #print(a)
+     
+     #datasetprint=form.datasetname.data.nameset
+     #postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
+     #cur.execute(postgreSQL_select_Query, [datasetprint])
+     #resultset = cur.fetchone()
+     #dataset_id = resultset[0]
+     #print('The rows of selected dataset in domain form are',resultset[0])
+
      #tasklist =1
      #task_id=1
-     dr=0
+     dr=dataset_risk
      status = 'pending'
      risk_level='low'
      reputation=10
@@ -488,7 +505,7 @@ def submithipaaform(requestid_domain):
      print(current_user.username)
      print(current_user.id)
      get_user_params = {"userId":current_user.id }
-     get_data_params = {"requestid":str(requestid_domain)}
+     get_data_params = {"requestId":str(requestid_domain)}
      #get_trans_params = {"request_id":requestid_domain}
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
      data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
@@ -504,21 +521,23 @@ def submithipaaform(requestid_domain):
      user_json = {"userId": current_user.id, "username" : current_user.username}
      #a=json.loads(user_json)
      #print(user_json)
-     dataset_json = {"datasetId" : dataset_id1,"risk_level": risk_level, "decision": decision, "reputation": reputation,"last_requester" :"resource:org.honestchain.User#" +str(current_user.username) }
+     dataset_json = {"requestId":str(requestid_domain),"datasetId" : dataset_id1,"risk_level": risk_level, "decision": decision, "reputation": reputation,"last_requester" :"resource:org.honestchain.User#" +str(current_user.username) }
      #dataset_json = {"datasetId": dataset_id1}   
      print("Dataset details",dataset_json)
      #trans = '{"inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (compliance, dr, dataset_json, user.content)
      #print(dataset)
      #print(trans)
-     if user.status_code == '200' or user.content == '[]':
+     if user.status_code == '200' or user.content != '[]':
          r_post_user = requests.post("http://3.81.13.0:3000/api/User", json=user_json)
      print(user.content)
-     if data.status_code == '200' or data.content == '[]':
+     if data.status_code == '200' or data.content != '[]':
          data = requests.post("http://3.81.13.0:3000/api/Dataset", json=dataset_json)
      print(data.content)
     # trans = '{"request_id": %s, "inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (requestid_domain,compliance, dr, data.content , "resources:org.honestchain.User#" +str(current_user.id))
      #if trans.status_code == '200' or trans.content == '[]': i
-     trans_json = {"requestid": requestid_domain,"datasetId": dataset_id1, "inputcs": compliance, "inputdr": dr, "dataset": "resource:org.honestchain.Dataset#"+ dataset_id1[0], "user" : "resource:org.honestchain.User#" +str(current_user.username)}
+     #trans_json = {"requestid": str(requestid_domain),"datasetId": dataset_id1, "inputcs": compliance, "inputdr": dr, "dataset": "resource:org.honestchain.Dataset#"+ dataset_id1[0], "user" : "resource:org.honestchain.User#" +str(current_user.username)}
+     trans_json = {"requestId": str(requestid_domain),"datasetId": dataset_id1, "inputcs": compliance, "inputdr": dr, "dataset": "resource:org.honestchain.Dataset#"+ str(requestid_domain), "user" : "resource:org.honestchain.User#" +str(current_user.username)}
+     
      print("Trans details" , trans_json)
      #if trans.status_code == '200' or trans.content == '[]':
      trans_post = requests.post("http://3.81.13.0:3000/api/ChainTransaction", json=trans_json)
@@ -534,15 +553,28 @@ def submithipaaform(requestid_domain):
     #a=a.encode("utf-8")
     #print type(a)
      b=result_get.content
+     
+     #print(b)
      b=b.encode("utf-8")
-     dic =json.loads(b)
-     print type(dic)
-     print dic
-     #text = dic[int(risk_level)]
+     b =json.loads(b)
+     #print(b)
+     #print type(dic)
+     #print dic
+     with open('data.csv', 'w') as csv_file:
+         #for requestId in b:
+         csv_writer = csv.writer(csv_file,lineterminator='\n')
+         csv_writer.writerow(b)
+
+     for requestId in b:
+         print(requestId)
+     #content=request.get_json()
+     #value1=content.get('decision')
+     #print(value1)
+     #text = dic[(datasetId)]
      #print type(text)
      #print text
-   
-   
+     
+     
 
         
      new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, requestid = requestid_domain, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
@@ -569,7 +601,7 @@ def submithipaaform(requestid_domain):
      #items = cursor.fetchall()
      if(current_user.username == 'internaluser'):
         # return render_template('hipaa.html',items=items)
-         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b)
         
      elif(current_user.username == 'externaluser'):
          return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
@@ -597,19 +629,33 @@ def identifierform():
 
 @app.route('/submitrequest', methods=['GET','POST'])
 def submitrequest():
-     print(current_user.username)
+     #print(current_user.username)
      form = CreateRequestForm()
-     print("user id is", current_user.id)
+     #print("user id is", current_user.id)
      #if form.validate_on_submit()
 
      datasetprint=form.datasetname.data.nameset
+     print('dataset is', datasetprint)
      postgreSQL_select_Query = "select * from data_catalog  where data_catalog.dataset_name = %s"
      cur.execute(postgreSQL_select_Query, [datasetprint])
      resultset = cur.fetchone()
-     #dataset_id = resultset[0]
-     print('The rows of selected dataset are',resultset)
+     print(resultset)
+     dataset_id_final = resultset[0]
+     postgreSQL_select_Query = "select dataset_score from data_catalog  where data_catalog.dataset_name = %(dataset_name)s"
+     #print(type(dataset_id_final))     
+     cur.execute(postgreSQL_select_Query,{'dataset_name':datasetprint})
+     resultset1 = cur.fetchone()
+        
+     print(resultset1[0])
+     dataset_risk=resultset1[0]
+     print('Data risk score is', dataset_risk)
+     print('The rows of selected dataset are',dataset_id_final)
      #print('datasetrisk',resultset[2])
      #print('User selected',datasetprint)
+    
+     
+     #sel_dataset=resultset[0]
+     #print("Selected dataset is", sel_dataset)   
 
      input_risk = list([1,3,3]);
      if(current_user.username == 'internal'):
@@ -659,6 +705,8 @@ def submitrequest():
     # print(new_request.requestid)
      db.session.commit()
      print(new_request.requestid)
+
+     print("Dataset id is" , new_request.datasetid)
      #request_info = RequestForm.query.filter_by( ownerid = current_user.id).all()
      #for request in request_info:
       #   requestObject = { 'status'  : request.status,
@@ -671,12 +719,13 @@ def submitrequest():
      apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'approved').all()
      deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id, status= 'denied').all() 
     # datasetid = resultset[0]
+    # p=result_get.content
 
      if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid)
+         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
          #return redirect('jupyter notebook')
      elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid)
+         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
 
    # return redirect('jupyter notebook')
 
@@ -714,11 +763,8 @@ def viewpendingreq(req_id):
     record = cur.fetchone()
     print("Result",record)
 
-    
-    
     approvedreq_info = RequestForm.query.filter_by(status= 'approved').all()
     denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
-
 
     return render_template('viewpendingreq.html', name = current_user.username,jupyter=jupyter, pendingreq_info = pendingreq_info, record=record)
 # have to modify
@@ -726,33 +772,6 @@ def viewpendingreq(req_id):
 @app.route('/jupyter', methods = ['GET',' POST'])
 @login_required
 def jupyter():
-    #return render_template('jupyter.html')
-    
-
-    #approvedreq_info = RequestForm.query.filter_by(status = 'approved').all()
-    #denyreq_info = RequestForm.query.filter_by(status= 'denied').all()
-    #pending_req = RequestForm.query.filter_by(status= 'pending').all()
-    #for j in approvedreq_info:
-     #   print("Approved request is",j.requestname)
-
-    #for i in approvedreq_info:
-     #   datasetinfo = Dataset.query.filter_by(datasetid = i.datasetid).all()
-    #for j in datasetinfo:
-     #   dataset_name = j.nameset
-    #pg_query = 'select * from data_catalog where dataset_name = %s'
-    #cur.execute(pg_query,[dataset_name])
-    #record = cur.fetchone()
-    #print("Result",record)
-    #cur.execute(record[4])
-    #data = cur.fetchall()
-    #rowcount = cur.rowcount
-    #print('row count', cur.rowcount)
-    #for v in data:
-        #for column, value in v.items()
-            #print('{0}: {1}'.format(column, value))
-
-    #return render_template('jupyter.html',name = current_user.username, approvedreq_info = approvedreq_info)
-# Have to modify
      #return redirect('http://127.0.0.1:8888/notebooks/Untitled%20Folder%201/Request_data.ipynb')
      return redirect('https://colab.research.google.com/drive/1MMRUuABHO0T-gx17dx4Lo-7Dzu21oGue')
 
@@ -902,20 +921,6 @@ def save_dialog():
     db.session.commit()
     return "Saved successfully"
     #return "Failed to save."
-
-
-tasks = [
-{
-  "$class": "org.honestchain.User",
-  "userId": "1293",
-  "datasetId": "DS101",
-  "task_list": []
-}
-]
-
-@app.route('/tasks',methods=['GET'])
-def get_tasks():
-    return jsonify({'tasks': tasks})
 
 
 if __name__ == '__main__':
