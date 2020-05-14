@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-import os
+import os, ast
 import psycopg2
 import json
 import sqlite3
@@ -308,9 +308,7 @@ def dashboard():
 
     
     if(current_user.username == 'Admin'):
-        return render_template('dashboard_admin.html',
-
- name = current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
+        return render_template('dashboard_admin.html',name = current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
     elif(current_user.username == 'internaluser'):
         print('internal user dashboard')
         apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
@@ -544,6 +542,16 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      print("Posted content",trans_post.content)
      result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
      print("Final Result",result_get.content)
+          
+     my_dict = ast.literal_eval(result_get.content)
+     last_elem = my_dict[-2:][0]
+     #last_elem = my_dict.pop()
+     for i in last_elem:
+         print("The required details are",i,last_elem[i])
+     print("The risk is",last_elem["risk_level"])
+     #value = my_dict[-1]
+     #print('Requestid is', value)
+     
      #print(trans_post.content)
      #print(result_get.content.decision)
         
