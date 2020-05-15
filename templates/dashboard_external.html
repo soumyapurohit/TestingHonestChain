@@ -43,9 +43,9 @@ Dashboard
 			window.location.href= link;
                 }
 
-		function domainform(requestid_domain){
+		function domainform(requestid_domain,dataset_id_final,dataset_risk){
 
-			var link = "{{url_for('hipaaform', requestid_domain ='requestid_domain') }}".replace('requestid_domain', requestid_domain);
+			var link = "{{url_for('hipaaform', requestid_domain ='requestid_domain',dataset_id_final='dataset_id_final',dataset_risk='dataset_risk') }}".replace('requestid_domain', requestid_domain);
                         window.location.href= link;
 
 		}
@@ -113,11 +113,13 @@ Dashboard
 			<input type = "submit"class = "btn btn-success" value="Request Form">
 		</form>	
 		
-		<input type ="button"  onclick= "domainform('{{requestid_domain}}')"  class = "btn btn-success" id='{{requestid_domain}}' value="Domain Form" method="get">
-                
+		<form action = " {{url_for('hipaaform', requestid_domain= requestid_domain, dataset_id_final = dataset_id_final,dataset_risk = dataset_risk)}}" method = "GET">
+			<input type ="submit"  class = "btn btn-success" value="Domain Form">
+		</form>
 		<form action =" {{url_for('feedback_form') }} " method ="get">
                         <input type = "submit"class = "btn btn-success" value="Feedback Form">
-		</form> 
+		</form>
+	
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
           <h2 class="sub-header">Pending Requests</h2>
           <div class="table-responsive">
@@ -142,51 +144,35 @@ Dashboard
             </table>
             <h2 class="sub-header">Approved Requests</h2>
 
-	   	<h4>Approved requests can be checked in Blockchain </h4>
+	    <!--	<h4>Approved requests can be checked in Blockchain </h4>  -->
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
-                   <!-- <tr>
+                   <tr>
                         <th>ID</th>
-                        <th>Request name</th>
-                        <th>Description</th>
-		   </tr>   -->
+                        <th>Details</th>
+			<!--  <th>Description</th> -->
+		   </tr> 
                     </thead>
-		    <tbody> 
-                    <!--        <tr>
-				    {% for apprInternal_info in apprInternal_info %}
-				    <td><a href = "#"  onclick = "viewappInternal('{{apprInternal_info.requestid}}')" id = '{{apprInternal_info.requestid}}'  method ="GET">{{apprInternal_info.requestid}}</a></td>
-				    <td id = "requestname">{{apprInternal_info.requestname}}</td>
-                                    <td>{{apprInternal_info.requestDescription}}</td>
-                                    
-		    </tr>
-		    {% endfor %}  -->
-                    </tbody>
-                </table>
-            </div>
-            <h2 class="sub-header">Denied Requests</h2>
-	    <h4>Denied requests can be checked in Blockchain </h4>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                   <!-- <tr>
-			    <th>ID</th>
-			<th>Request Name</th>
-                        <th>Description</th>
-		   </tr> -->
-                    </thead>
-                    <tbody>
-                         <!--   <tr>
-                                    {% for deniedInternal_info in deniedInternal_info %}
-				    <td><a href = "#"  id = '{{deniedInternal_info.requestid}}' method ="GET">{{deniedInternal_info.requestid}}</a></td>
-                                    <td id = "requestname">{{deniedInternal_info.requestname}}</td>
-                                    <td>{{deniedInternal_info.requestDescription}}</td>
-                                   
-                            </tr>
-			    {% endfor %} -->
-                    </tbody>
-                </table>
+		    <tbody>
+			      <tr>
+
+                      		
+			 {% for i in b %}
+                                <td id = "ID">{{i['requestId']}}</td>
+                         <td id = "Details">{{i['decision']}}</td>
+                                <!--    <td id = "Details">{{b}}</td> -->
+
+
+                                      </tr>
+			{% endfor %}
+
+
+
+	</table>
             </div>
       </div>
     </div>
 {% endblock %}
+
+                 

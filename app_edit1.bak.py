@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-import os
+import os, ast
 import psycopg2
 import json
 import sqlite3
@@ -208,7 +208,7 @@ class CreateRequestForm(FlaskForm):
     typeofdata=StringField('What type of data would you like to receive', validators=[InputRequired(), Length(min=4, max=40)])
 
 class CreateTrustCalcForm(FlaskForm):
-    #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])i
+    #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])
      irb_id = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
      #requestid = QuerySelectField(query_factory=choice_request, allow_blank=True, get_label = 'requestid')
      radiology_images = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
@@ -259,7 +259,6 @@ def signup():
         flash("Registration successful!", "success")
         new_user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(new_user)
-        db.session.commit()
 
         return '<h1> New user has been registered</h1>'
 
@@ -272,10 +271,8 @@ def signup():
 def intro():
     return render_template('intro.html')
 
-
-@app.route('/dashboard/', methods=['GET','POST'])
+@app.route('/dashboard', methods=['GET','POST'])
 @login_required
-
 def dashboard():
     #conn = psycopg2.connect("host=hbcdm.ce9qkwq3sggt.us-east-1.rds.amazonaws.com dbname=hbcdm user=hbadmin password=hbaccess")
     cur = conn.cursor()
@@ -288,18 +285,8 @@ def dashboard():
     #resulset = cur.fetchall()
     cur.execute('SELECT * FROM data_catalog')
     resultset = cur.fetchall()
-    f = open("requestid.txt","r")
-    requestid_domain=f.read()
-    
-    #requestid_domain = session.get('requestId')
-    get_data_params = {"requestId":str(requestid_domain)}
-    result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
-    print("Final Result",result_get.content)
-    b=result_get.content
-    b =json.loads(b)
-    app_req = [ x for x in b if x['decision'] == 'approved' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-    deny_req = [ x for x in b if x['decision'] == 'denied'  and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-    manual_req = [x for x in b if x['decision'] == 'manual approval required' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+
+
     #rows = cur.rowcount
     #query = cur.query
 
@@ -320,31 +307,26 @@ def dashboard():
         print("pending request id is",i.requestid)
 
     
-   # if(current_user.username == 'Admin'):
-    #    return render_template('dashboard_admin.html',name=current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
-       
-
-        #apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
-        #pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        #deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
-        #for i in pendingreq_info: 
-           # print("Request Id is ",i.requestid)
-            #print("Internal user approved request is ",i.requestname)
-        
-    return render_template('request_status.html',name = current_user.username, b=b, app_req = app_req, deny_req = deny_req, manual_req = manual_req)
-        
-        #return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
-        #return render_template('dashboard.html', pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
-    
-    #else:
-        #print('external user dashboard')
-        #apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
-        #print('Id for external user is Hi',current_user.id)
-        #request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
-        #deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
-        #for i in apprInternal_info:
-         #   print("Internal user approved request is ",i.requestname)
-        #return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
+    if(current_user.username == 'Admin'):
+        return render_template('dashboard_admin.html',name = current_user.username, pending_req= pending_req, approvedreq_info= approvedreq_info, denyreq_info=denyreq_info, resultset=resultset)
+    elif(current_user.username == 'internaluser'):
+        print('internal user dashboard')
+        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        for i in pendingreq_info: 
+            print("Request Id is ",i.requestid)
+            print("Internal user approved request is ",i.requestname)
+        return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
+    else:
+        print('external user dashboard')
+        apprInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'approved').all()
+        print('Id for external user is Hi',current_user.id)
+        request_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'pending').all()
+        deniedInternal_info = RequestForm.query.filter_by(ownerid=current_user.id ,status = 'denied').all()
+        for i in apprInternal_info:
+            print("Internal user approved request is ",i.requestname)
+        return render_template('dashboard_external.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
 #@app.route('/dashboard_admin')
 #@login_required
 #def dashboad_admin():
@@ -522,9 +504,6 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      print(current_user.id)
      get_user_params = {"userId":current_user.id }
      get_data_params = {"requestId":str(requestid_domain)}
-     f= open("requestid.txt","w+")
-     f.write(requestid_domain)
-     f.close()
      #get_trans_params = {"request_id":requestid_domain}
      user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
      data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
@@ -563,6 +542,16 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      print("Posted content",trans_post.content)
      result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
      print("Final Result",result_get.content)
+          
+     my_dict = ast.literal_eval(result_get.content)
+     last_elem = my_dict[-2:][0]
+     #last_elem = my_dict.pop()
+     for i in last_elem:
+         print("The required details are",i,last_elem[i])
+     print("The risk is",last_elem["risk_level"])
+     #value = my_dict[-1]
+     #print('Requestid is', value)
+     
      #print(trans_post.content)
      #print(result_get.content.decision)
         
@@ -574,58 +563,18 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      b=result_get.content
      
      #print(b)
-     #b=b.encode("utf-8")
+     b=b.encode("utf-8")
      b =json.loads(b)
-     for i in b:
-        a=i['requestId']
-        print(a)
-        print(len(i))
-        print(len(b))
-        c=i['requestId'],i['datasetId'],i['risk_level'],i['reputation'],i['decision']
-        d=i['decision']
-        e = i['datasetId']
-    
-        app_req = [ x for x in b if x['decision'] == 'approved' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-        deny_req = [ x for x in b if (x['decision'] == 'denied')  and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-        manual_req = [x for x in b if x['decision'] == 'manual approval required' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-        reqid_table=RequestForm.query.filter_by(requestid=a ).all()
-        #for i in app_req:
-            #print('app req is',app_req['requestId'])
-        print('approved request printed before') 
-        for i in reqid_table:
-            print(i.requestname)
-            print(i.requestDescription)
-
-    
-        print(c)
-        #print[i['requestId'],i['datasetId'],i['risk_level'],i['reputation'],i['decision']]
-        #print(i['requestId'])
-        #a=i['requestId']
-        
-        #print(i['requestId'])   
-
-   
-        #print(a)
-        #for i['requestId'] in b:
-         #   print[i['requestId'],i['datasetId'],i['risk_level'],i['reputation'],i['decision']]
-     #print("1st element :" b[requestId])
-     #with open('b') as f:
-      #   file=json.load(f)
-     #print(file['requestId'])    
-        
-     #print(b[requestId])
+     #print(b)
      #print type(dic)
      #print dic
-     #with open('data.csv', 'w') as csv_file:
+     with open('data.csv', 'w') as csv_file:
          #for requestId in b:
-         #csv_writer = csv.writer(csv_file,lineterminator='\n')
-         #csv_writer.writerow(b)
-    # pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
-    # pendingreq_info.requestid=requestId 
-    
-         #pendingreq_info = RequestForm.query.filter_by(ownerid=current_user.id, status = 'pending').all()
-         #pendingreq_info.requestid=requestId
-         #print(requestId)
+         csv_writer = csv.writer(csv_file,lineterminator='\n')
+         csv_writer.writerow(b)
+
+     for requestId in b:
+         print(requestId)
      #content=request.get_json()
      #value1=content.get('decision')
      #print(value1)
@@ -658,13 +607,12 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
 
      #cursor = db.execute('SELECT * FROM trust_calc_form')
      #items = cursor.fetchall()
-    
+     if(current_user.username == 'internaluser'):
         # return render_template('hipaa.html',items=items)
-     return dashboard(b)
-     #return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d)
-     #return render_template('request_status.html',form=form,name = current_user.username, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
-     
-        # return render_template('request_status.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b)
+        
+     elif(current_user.username == 'externaluser'):
+         return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data)
 
 
 @app.route('/print_items')
@@ -941,21 +889,6 @@ def request_form():
     return render_template('request.html', form=form)
    # return render_template('bot/index_bot.html', form=form)
 
-@app.route('/viewdata/<dataid>',methods=['GET','POST'])
-def viewdata(dataid):
-    
-    print(dataid)
-    a=dataid
-    postgreSQL_select_Query = "select * from data_catalog where data_catalog.dataset_id = %(dataset_id)s"
-    cur.execute(postgreSQL_select_Query,{'dataset_id':dataid})
-    record = cur.fetchone()
-    #print("Result",record)
-    cur.execute(record[4])
-    data = cur.fetchall()
-    rowcount = cur.rowcount
-    return render_template('viewapprovedata.html',name = current_user.username, dataid=dataid, data = data, rowcount = rowcount, record=record)
-
-
 
 @app.route('/feedbackform',methods=['GET','POST'])
 def feedback_form():
@@ -964,7 +897,7 @@ def feedback_form():
 
 @app.route('/submitfeedbackform',methods=['GET','POST'])
 def submitfeedbackform():
-    return render_template('end.html')
+    return render_template('dashboard.html')
 
 @app.route('/')
 def bc():

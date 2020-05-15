@@ -43,6 +43,12 @@ Dashboard
 			window.location.href= link;
                 }
 
+		function viewdata(dataid){
+
+			var link = "{{url_for('viewdata', dataid ='dataid') }}".replace('dataid', dataid);
+                        window.location.href= link;
+                }
+
 		function domainform(requestid_domain,dataset_id_final,dataset_risk){
 
 			var link = "{{url_for('hipaaform', requestid_domain ='requestid_domain',dataset_id_final='dataset_id_final',dataset_risk='dataset_risk') }}".replace('requestid_domain', requestid_domain);
@@ -121,22 +127,21 @@ Dashboard
 		</form>
 	
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
-          <h2 class="sub-header">Pending Requests</h2>
+          <h2 class="sub-header">Manual Approval Required</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Request name</th>
-                  <th>Description</th>
+                  <th>DatasetId</th>
+                
                 </tr>
               </thead>
               <tbody>
   			<tr>
-			{% for pendingreq_info in pendingreq_info %}
-			<td><a href = "#"  onclick = "viewpendingreq('{{pendingreq_info.requestid}}')" id = '{{pendingreq_info.requestid}}'  method ="GET">{{pendingreq_info.requestid}}</a></td>
-			<td id = "requestname">{{pendingreq_info.requestname}}</td>
-			<td>{{pendingreq_info.requestDescription}}</td> 
+			{% for manual_req in manual_req %}
+			<td id = '{{manual_req['requestId']}}'  method ="GET">{{manual_req['requestId']}}</td>
+			<td id = "requestname">{{manual_req.datasetId}}</td>
     			
                 </tr>
 		{% endfor %}
@@ -150,7 +155,7 @@ Dashboard
                     <thead>
                    <tr>
                         <th>ID</th>
-                        <th>Details</th>
+			<th>DatasetId</th>
 			<!--  <th>Description</th> -->
 		   </tr> 
                     </thead>
@@ -158,10 +163,11 @@ Dashboard
 			      <tr>
 
                       		
-			 {% for i in b %}
-                                <td id = "ID">{{i['requestId']}}</td>
-                         <td id = "Details">{{i['decision']}}</td>
-                                <!--    <td id = "Details">{{b}}</td> -->
+			 {% for app_req in app_req %}
+                 <td = "ID">{{app_req['requestId']}}</td>
+                 <td><a href = "#"  onclick = "viewdata('{{app_req['datasetId']}}')" id = '{{app_req['datasetId']}}'  method ="GET">{{app_req['datasetId']}}</a></td>        
+		 
+			
 
 
                                       </tr>
@@ -170,6 +176,31 @@ Dashboard
 
 
 	</table>
+	<h2 class="sub-header">Denied Requests</h2>
+
+            <!--        <h4>Approved requests can be checked in Blockchain /h4>  -->
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                   <tr>
+                        <th>ID</th>
+                        <th>DatasetId</th>
+                        <!--  <th>Description</th> -->
+                   </tr>
+                    </thead>
+                    <tbody>
+                              <tr>
+
+
+                         {% for deny_req in deny_req %}
+                 <td = "ID">{{deny_req['requestId']}}</td>
+                 <td  id = '{{deny_req['datasetId']}}'  method ="GET">{{deny_req['datasetId']}}</td>
+
+
+
+
+                                      </tr>
+                        {% endfor %}
             </div>
       </div>
     </div>
