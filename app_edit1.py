@@ -660,11 +660,11 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #items = cursor.fetchall()
     
         # return render_template('hipaa.html',items=items)
-     return dashboard(b)
+     
      #return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d)
      #return render_template('request_status.html',form=form,name = current_user.username, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
      
-        # return render_template('request_status.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
+     return render_template('request_status.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
 
 
 @app.route('/print_items')
@@ -781,12 +781,24 @@ def submitrequest():
     # datasetid = resultset[0]
     # p=result_get.content
 
-     if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
+     #if(current_user.username == 'internaluser'):
+      #   return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
          #return redirect('jupyter notebook')
-     elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
+     #elif(current_user.username == 'externaluser'):
+      #   return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
+     f = open('requestid.txt','r')
+     requestid_domain=f.read()
 
+    #requestid_domain = session.get('requestId')
+     get_data_params = {"requestId":str(requestid_domain)}
+     result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     print("Final Result",result_get.content)
+     b=result_get.content
+     b =json.loads(b)
+     app_req = [ x for x in b if x['decision'] == 'approved' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+     deny_req = [ x for x in b if x['decision'] == 'denied'  and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+     manual_req = [x for x in b if x['decision'] == 'manual approval required' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+     return render_template('request_status.html',requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk, name = current_user.username, b=b, app_req = app_req, deny_req = deny_req, manual_req = manual_req)
    # return redirect('jupyter notebook')
 
 @app.route('/viewmyreq/<req_id>', methods = ['GET',' POST'])
