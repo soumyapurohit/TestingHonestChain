@@ -78,19 +78,18 @@ Dashboard
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-	<li class="dropdown">
+		  <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Contact Us
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li><a href="#">Soumya Purohit - spvm7@mail.missouri.edu</a></li>
-          <li><a href="#">Ramya Naga Bhamidipati - nbny6@mail.missouri.edu</a></li>
-
+	  <li><a href="#">Ramya Naga Bhamidipati - nbny6@mail.missouri.edu</a></li>
+          
         </ul>
       </li>
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
-	   
 	    <li><a href=" {{url_for('logout') }}">Logout</a></li>
           </ul>
           <form class="navbar-form navbar-right">
@@ -100,9 +99,9 @@ Dashboard
       </div>
     </nav>
 
-    <div class="container-fluid">
+    <!--    <div class="container-fluid">
       <div class="row">
-       <!--<div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
             <li><a href="#">Reports</a></li>
@@ -122,14 +121,12 @@ Dashboard
             <li><a href="">Another nav item</a></li>
           </ul>
 	</div>
-	--> 
+    -->
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                <h1 class="page-header">Welcome , {{name}}</h1>
-	       <!--
-	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. Finally after receiving the data, fill the feedback form.</h4>
-	       -->
-	       <h4> Your request has been successfully submitted! Please check the Approved Requests section if your dataset is available </h4>
-	      <table>
+	       <h4><a href = "https://www.youtube.com/watch?v=Vyaxh0wqsAk">Please watch the tutorial to understand how to submit a data request using Request and Domain forms</a></h4>
+	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. After receiving the data, please provide your valuable feedback in the feedback form.</h4>
+		<table>
 			<tr>
 		<form action =" {{url_for('request_form') }} " method ="get">
 			<td width = "20%" ><input type = "submit"class = "btn btn-success" value="Request Form"></td>
@@ -138,24 +135,22 @@ Dashboard
 		<form action = " {{url_for('hipaaform', requestid_domain= requestid_domain, dataset_id_final = dataset_id_final,dataset_risk = dataset_risk)}}" method = "GET">
 			<td width = "20%"><input type ="submit"  class = "btn btn-success" value="Domain Form"></td>
 		</form>
-
 			</tr>
 		</table>
-		<!--
-		<h4> Your request has been successfully submitted! Please check the Approved Requests section if your dataset is available </h4>	
-		-->
-		<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
-            <h4> Please fill the feedback form </h4>
-	    <table>
-		    <tr>
-			    <form action =" {{url_for('feedback_form') }} " method ="get">
-                        <td width = "10%"><input type = "submit"class = "btn btn-success" value="Feedback Form"></td>
-                </form>
-		    </tr>
-	    </table>
+	
+	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
+		<h4> Please fill the feedback form</h4>
+		<table>
+			<tr>
+			<form action =" {{url_for('feedback_form') }} " method ="get">
+				<td><input type = "submit"class = "btn btn-success" value="Feedback Form"></td>
+			</form>
+				</tr>
+		</table>
+		
             <h2 class="sub-header">Approved Requests</h2>
-	    <h4> * Requests approved automatically </h4>
 
+	    <h4> * Requests approved automatically </h4>
 	    <!--	<h4>Approved requests can be checked in Blockchain </h4>  -->
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -185,8 +180,8 @@ Dashboard
 	</table>
 
 	<h2 class="sub-header">Manual Approval Required</h2>
-	<h4> * Your data request need to be evaluated manually! Please check the status of your request in 5 business days in this section </h4>
-          <div class="table-responsive">
+        <h4> * Your data request needs to be evaluated manually! Please check the status of your request in 5 business days in this section </h4>  
+	<div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -237,7 +232,9 @@ Dashboard
             </div>
       </div>
     </div>
-    
+   
+
+
 {% endblock %}
 
                  

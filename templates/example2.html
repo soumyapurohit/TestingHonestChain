@@ -25,35 +25,37 @@ Domain Form Entry
 <div class="container">
 
 	<form  action ="{{ url_for('submithipaaform', requestid_domain=requestid_domain,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk) }} " method ="POST">
-    <h2 class="form-signin-heading">Domain Form Entry</h2>
+    <h2 style= text-align:center; class="form-signin-heading">Domain Form Entry</h2>
+    <h4 style= text-align:center;> Please fill the form as Yes or No for the required fields</h4>
     {{form.hidden_tag() }}
     
 <tr>
-    <td>{{ wtf.form_field(form.irb_id) }}</td>
-    <td>{{ wtf.form_field(form.radiology_images) }}</td>
-    <td>{{ wtf.form_field(form.radiology_imaging_reports) }}</td>
-    <td>{{ wtf.form_field(form.ekg) }}</td>
-    <td>{{ wtf.form_field(form.progress_notes) }}</td>
-    <td>{{ wtf.form_field(form.history_phy) }}</td>
-    <td>{{ wtf.form_field(form.oper_report) }}</td>
-    <td>{{ wtf.form_field(form.path_report) }}</td>
-    <td>{{ wtf.form_field(form.lab_report)}}</td>
-    <td>{{ wtf.form_field(form.photographs)}}</td>
-    <td>{{ wtf.form_field(form.discharge_summaries)}}</td>
-    <td>{{ wtf.form_field(form.health_care_billing)}}</td>
-    <td>{{ wtf.form_field(form.consult)}}</td>
-    <td>{{ wtf.form_field(form.medication)}}</td>
-    <td>{{ wtf.form_field(form.emergency)}}</td>
-    <td>{{ wtf.form_field(form.dental)}}</td>
-    <td>{{ wtf.form_field(form.demographic)}}</td>
-    <td>{{ wtf.form_field(form.question)}}</td>
-    <td>{{ wtf.form_field(form.audiotape)}}</td>
+    <td style="width:50px">{{ wtf.form_field(form.Select_project_id_from_the_list) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_radiology_images) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_radiology_imaging_reports) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_electrocardiography) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_progress_notes) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_history_and_physical_exams) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_operative_reports) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_pathology_reports) }}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_laboratory_reports)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_photographs_or_videotapes)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_discharge_summaries)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_health_care_billing)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_consultation_records)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_medication_records)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_emergency_medicine_reports)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_dental_records)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_demographic_information)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_questionnaires)}}</td>
+    <td>{{ wtf.form_field(form.Do_you_need_details_about_audiotapes)}}</td>
     
    
 </tr>
 <button class="btn btn-lg btn-success btn-block" type="submit">Submit</button>
 	</form>
 
+<body background="{{ url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
    
   <div> <!-- /container -->
 

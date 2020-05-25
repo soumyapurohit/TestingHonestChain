@@ -1,5 +1,7 @@
 {% extends "bootstrap/base.html" %}
 
+
+
 {% block title %}
 Dashboard
 {% endblock %}
@@ -72,6 +74,15 @@ Dashboard
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
+		  <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Contact Us
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">Soumya Purohit - spvm7@mail.missouri.edu</a></li>
+          <li><a href="#">Ramya Naga Bhamidipati - nbny6@mail.missouri.edu</a></li>
+
+        </ul>
+      </li>
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Settings</a></li>
             <li><a href="#">Profile</a></li>
@@ -109,19 +120,27 @@ Dashboard
     -->
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                <h1 class="page-header">Welcome , {{name}}</h1>
+	       <!--
+	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. Finally after receiving the data, fill the feedback form.</h4>
+	       -->
+	       <h4> Your request has been submitted! Please fill out the domain form to complete the request submission process</h4>
+	       <table>
+		       <tr>
 		<form action =" {{url_for('request_form') }} " method ="get">
-			<input type = "submit"class = "btn btn-success" value="Request Form">
+			<td width = "20%">	<input type = "submit"class = "btn btn-success" value="Request Form"> </td>
 		</form>	
-		
 		<form action = " {{url_for('hipaaform', requestid_domain= requestid_domain, dataset_id_final = dataset_id_final,dataset_risk = dataset_risk)}}" method = "GET">
-			<input type ="submit"  class = "btn btn-success" value="Domain Form">
+			<td width = "10%">	<input type ="submit"  class = "btn btn-success" value="Domain Form"> </td>
 		</form>
+
 		<form action =" {{url_for('feedback_form') }} " method ="get">
-                        <input type = "submit"class = "btn btn-success" value="Feedback Form">
+			<td width = "20%">      <input type = "submit"class = "btn btn-success" value="Feedback Form"> </td>
 		</form>
+		       </tr>
+		       </table>
 	
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
-          <h2 class="sub-header">Pending Requests</h2>
+          <h2 class="sub-header">Submitted Requests</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -140,20 +159,20 @@ Dashboard
     			
                 </tr>
 		{% endfor %}
+
+	
               </tbody>
+	     
             </table>
-            <h2 class="sub-header">Approved Requests</h2>
+         <!--   <h2 class="sub-header">Approved Requests</h2>
 
 	    <!--	<h4>Approved requests can be checked in Blockchain </h4>  -->
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
-                   <tr>
-                        <th>ID</th>
-                        <th>Details</th>
-			<!--  <th>Description</th> -->
-		   </tr> 
+                   
                     </thead>
+		    <body background="{{url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
 		    <tbody>
 			      <tr>
 
@@ -170,7 +189,7 @@ Dashboard
 
 
 	</table>
-            </div>
+	    </div> 
       </div>
     </div>
 {% endblock %}

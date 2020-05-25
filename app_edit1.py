@@ -71,6 +71,40 @@ class RequestForm(UserMixin, db.Model):
 class trial(UserMixin, db.Model):
     data_set_name=db.Column(db.String(40),primary_key = True)
 
+class Userequestdata(UserMixin, db.Model):
+    useid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    usedetails = db.Column(db.String(40))
+
+class Storerequestdata(UserMixin, db.Model):
+    storeid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    storedetails = db.Column(db.String(70))
+
+class Longrequestdata(UserMixin, db.Model):
+    longid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    longdetails = db.Column(db.String(40))
+
+class Soonrequestdata(UserMixin, db.Model):
+    soonid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    soondetails = db.Column(db.String(40))
+
+class Typerequestdata(UserMixin, db.Model):
+    typeid = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    typedetails = db.Column(db.String(40))
+
+def choice_userequestdata():
+    return Userequestdata.query
+
+def choice_storerequestdata():
+    return Storerequestdata.query
+
+def choice_longrequestdata():
+    return Longrequestdata.query
+
+def choice_soonrequestdata():
+    return Soonrequestdata.query
+
+def choice_typerequestdata():
+    return Typerequestdata.query
 
 class IrbInfo(UserMixin, db.Model):
     irbunique = db.Column(db.Integer, primary_key = True, autoincrement = True)
@@ -107,7 +141,7 @@ class TrustCalcForm(UserMixin, db.Model):
     dental = db.Column(db.String(10))
     demographic = db.Column(db.String(10))
     question = db.Column(db.String(10))
-    audiotape = db.Column(db.String(10))
+    audiotape = db.Column(db.String(10))    
     #other = db.Column(db.String(10))
     compliance =db.Column(db.Integer,nullable=False)
     match = db.Column(db.String(10))
@@ -196,40 +230,40 @@ class FeedbackForm(FlaskForm):
 
 
 class CreateRequestForm(FlaskForm):
-    requestname = StringField('Title', validators=[InputRequired(), Length(min=4, max=15)])
-    requestDescription =  StringField('Description', validators=[InputRequired(), Length(min=4, max=40)])
+    requestname = StringField('Title of the Request (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=15)])
+    requestDescription =  StringField('Description (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=40)])
     #datasetname =StringField('Which dataset are you trying to access', validators=[InputRequired(), Length(min=4, max=60)]) 
     datasetname = QuerySelectField(query_factory=choice_dataset, allow_blank=True, get_label = 'nameset')
-    use =StringField('How will you use the data', validators=[InputRequired(), Length(min=4, max=40)])
-    store=StringField('How will you store data', validators=[InputRequired(), Length(min=4, max=40)])
-    longdata=StringField('How long data needs to be accessible', validators=[InputRequired(), Length(min=4, max=40)])
-    soondata=StringField('How soon data needs to be accessible', validators=[InputRequired(), Length(min=4, max=40)])
+    usage_of_data =QuerySelectField(query_factory=choice_userequestdata, allow_blank=True, get_label = 'usedetails')
+    storage_of_data=QuerySelectField(query_factory=choice_storerequestdata, allow_blank=True, get_label = 'storedetails')
+    long_data_requirement=QuerySelectField(query_factory=choice_longrequestdata, allow_blank=True, get_label = 'longdetails')
+    sooner_data_requirement=QuerySelectField(query_factory=choice_soonrequestdata, allow_blank=True, get_label = 'soondetails')
     #dstype = QuerySelectField(query_factory=choice_typeofdata, allow_blank=True)
-    typeofdata=StringField('What type of data would you like to receive', validators=[InputRequired(), Length(min=4, max=40)])
+    typeofdata=QuerySelectField(query_factory=choice_typerequestdata, allow_blank=True, get_label = 'typedetails')
 
 class CreateTrustCalcForm(FlaskForm):
     #CaStatus = QuerySelectField('Enter your choice', choices=[('Yes', 'Yes'), ('No', 'No'), ('Uncertain', 'Uncertain')])i
-     irb_id = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
+     Select_project_id_from_the_list = QuerySelectField(query_factory=choice_irb, allow_blank=True, get_label = 'irb_id')
      #requestid = QuerySelectField(query_factory=choice_request, allow_blank=True, get_label = 'requestid')
-     radiology_images = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     radiology_imaging_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     ekg = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     progress_notes = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     history_phy = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     oper_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     path_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     lab_report = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     photographs  = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_radiology_images = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_radiology_imaging_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_electrocardiography = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_progress_notes = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_history_and_physical_exams = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_operative_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_pathology_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_laboratory_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_photographs_or_videotapes = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      #ssn = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     discharge_summaries = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     health_care_billing = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     consult = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     medication = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     emergency = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     dental = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     demographic = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     question = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
-     audiotape = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_discharge_summaries = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_health_care_billing= QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_consultation_records = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_medication_records = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_emergency_medicine_reports = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_dental_records = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_demographic_information = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_questionnaires = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
+     Do_you_need_details_about_audiotapes = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
      #other = QuerySelectField(query_factory=choice_trustcalc, allow_blank=True, get_label = 'decision')
 
 
@@ -273,7 +307,7 @@ def intro():
     return render_template('intro.html')
 
 
-@app.route('/dashboard/', methods=['GET','POST'])
+@app.route('/dashboard', methods=['GET','POST'])
 @login_required
 
 def dashboard():
@@ -293,7 +327,7 @@ def dashboard():
     
     #requestid_domain = session.get('requestId')
     get_data_params = {"requestId":str(requestid_domain)}
-    result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+    result_get = requests.get("http://34.207.136.193:3000/api/Dataset", params=get_data_params)
     print("Final Result",result_get.content)
     b=result_get.content
     b =json.loads(b)
@@ -331,7 +365,7 @@ def dashboard():
            # print("Request Id is ",i.requestid)
             #print("Internal user approved request is ",i.requestname)
         
-    return render_template('request_status.html',name = current_user.username, b=b, app_req = app_req, deny_req = deny_req, manual_req = manual_req)
+    return render_template('request_status2.html',name = current_user.username, b=b, app_req = app_req, deny_req = deny_req, manual_req = manual_req)
         
         #return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
         #return render_template('dashboard.html', pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
@@ -388,35 +422,35 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #print('global variable value is',requestid_domain)
      #print('Domain id', requestid_domain)
      form = CreateTrustCalcForm()
-     if form.validate_on_submit:
-         print('Form is validated')
-         print(form.irb_id.data.irb_id)
-     print('form irb_id and form radiology image is',form.irb_id.data, form.radiology_imaging_reports.data.decision)
-     irb_id = form.irb_id.data.irb_id
+     #if form.validate_on_submit:
+         #print('Form is validated')
+        # print(form.irb_id.data.irb_id)
+     #print('form irb_id and form radiology image is',form.irb_id.data, form.radiology_imaging_reports.data.decision)
+     Select_project_id_from_the_list = form.Select_project_id_from_the_list.data.irb_id
      #requestid = form.requestid.data.requestid   
-     radiology_images = form.radiology_images.data.decision
-     radiology_imaging_reports = form.radiology_imaging_reports.data.decision
-     ekg = form.ekg.data.decision
-     progress_notes = form.progress_notes.data.decision
-     history_phy = form.history_phy.data.decision
-     oper_report = form.oper_report.data.decision
-     path_report = form.path_report.data.decision
-     lab_report = form.lab_report.data.decision
-     photographs = form.photographs.data.decision
+     Do_you_need_details_about_radiology_images = form.Do_you_need_details_about_radiology_images.data.decision
+     Do_you_need_details_about_radiology_imaging_reports = form.Do_you_need_details_about_radiology_imaging_reports.data.decision
+     Do_you_need_details_about_electrocardiography = form.Do_you_need_details_about_electrocardiography.data.decision
+     Do_you_need_details_about_progress_notes = form.Do_you_need_details_about_progress_notes.data.decision
+     Do_you_need_details_about_history_and_physical_exams = form.Do_you_need_details_about_history_and_physical_exams.data.decision
+     Do_you_need_details_about_operative_reports = form.Do_you_need_details_about_operative_reports.data.decision
+     Do_you_need_details_about_pathology_reports = form.Do_you_need_details_about_pathology_reports.data.decision
+     Do_you_need_details_about_laboratory_reports = form.Do_you_need_details_about_laboratory_reports.data.decision
+     Do_you_need_details_about_photographs_or_videotapes = form.Do_you_need_details_about_photographs_or_videotapes.data.decision
      #ssn = form.ssn.data.decision
-     discharge_summaries = form.discharge_summaries.data.decision
-     health_care_billing = form.health_care_billing.data.decision
-     consult = form.consult.data.decision
-     medication = form.medication.data.decision
-     emergency  = form.emergency.data.decision
-     dental = form.dental.data.decision
-     demographic = form.demographic.data.decision
-     question = form.question.data.decision
-     audiotape = form.audiotape.data.decision
+     Do_you_need_details_about_discharge_summaries = form.Do_you_need_details_about_discharge_summaries.data.decision
+     Do_you_need_details_about_health_care_billing= form.Do_you_need_details_about_health_care_billing.data.decision
+     Do_you_need_details_about_consultation_records= form.Do_you_need_details_about_consultation_records.data.decision
+     Do_you_need_details_about_medication_records = form.Do_you_need_details_about_medication_records.data.decision
+     Do_you_need_details_about_emergency_medicine_reports  = form.Do_you_need_details_about_emergency_medicine_reports.data.decision
+     Do_you_need_details_about_dental_records = form.Do_you_need_details_about_dental_records.data.decision
+     Do_you_need_details_about_demographic_information = form.Do_you_need_details_about_demographic_information.data.decision
+     Do_you_need_details_about_questionnaires = form.Do_you_need_details_about_questionnaires.data.decision
+     Do_you_need_details_about_audiotapes = form.Do_you_need_details_about_audiotapes.data.decision
      #other = form.other.data.decision
      
      #reqvar =  User.query.filter_by(ownerid=current_user.id) 
-     templist = [radiology_images, radiology_imaging_reports, ekg, progress_notes, history_phy, oper_report, path_report, lab_report, photographs, discharge_summaries, health_care_billing, consult, medication, emergency, dental, demographic, question, audiotape]
+     templist = [Do_you_need_details_about_radiology_images, Do_you_need_details_about_radiology_imaging_reports, Do_you_need_details_about_electrocardiography, Do_you_need_details_about_progress_notes, Do_you_need_details_about_history_and_physical_exams, Do_you_need_details_about_operative_reports, Do_you_need_details_about_pathology_reports, Do_you_need_details_about_laboratory_reports, Do_you_need_details_about_photographs_or_videotapes, Do_you_need_details_about_discharge_summaries, Do_you_need_details_about_health_care_billing, Do_you_need_details_about_consultation_records, Do_you_need_details_about_medication_records , Do_you_need_details_about_emergency_medicine_reports , Do_you_need_details_about_dental_records, Do_you_need_details_about_demographic_information , Do_you_need_details_about_questionnaires, Do_you_need_details_about_audiotapes]
      if (current_user.username == 'internaluser'):
          userrole = 'internal_user'
      elif (current_user.username == 'externaluser'):
@@ -432,7 +466,7 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #    print('item details',i)
 
      postgreSQL_select_Query = "select * from data_policy_domain  where data_policy_domain.irb_number = %s"
-     cur.execute(postgreSQL_select_Query, [irb_id])
+     cur.execute(postgreSQL_select_Query, [Select_project_id_from_the_list])
      resultset = cur.fetchone()
      #dataset_id = resultset[0]
      #print('resultset is',resultset)
@@ -503,7 +537,7 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #dataset_id = resultset[0]
      #print('The rows of selected dataset in domain form are',resultset[0])
 
-     #tasklist =1
+     #tasklist =1   
      #task_id=1
      dr=dataset_risk
      status = 'pending'
@@ -526,8 +560,8 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      f.write(requestid_domain)
      f.close()
      #get_trans_params = {"request_id":requestid_domain}
-     user = requests.get("http://3.81.13.0:3000/api/User", params=get_user_params)
-     data = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     user = requests.get("http://34.207.136.193:3000/api/User", params=get_user_params)
+     data = requests.get("http://34.207.136.193:3000/api/Dataset", params=get_data_params)
      #trans = requests.get("http://3.81.13.0:3000/api/ChainTransaction",params=get_trans_params)
      #print(trans.content)
      #print(trans.status_code)
@@ -547,10 +581,10 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #print(dataset)
      #print(trans)
      if user.status_code == '200' or user.content != '[]':
-         r_post_user = requests.post("http://3.81.13.0:3000/api/User", json=user_json)
+         r_post_user = requests.post("http://34.207.136.193:3000/api/User", json=user_json)
      print(user.content)
      if data.status_code == '200' or data.content != '[]':
-         data = requests.post("http://3.81.13.0:3000/api/Dataset", json=dataset_json)
+         data = requests.post("http://34.207.136.193:3000/api/Dataset", json=dataset_json)
      print(data.content)
     # trans = '{"request_id": %s, "inputcs": %s, "inputdr": %s, "dataset": %s, "user": %s}' % (requestid_domain,compliance, dr, data.content , "resources:org.honestchain.User#" +str(current_user.id))
      #if trans.status_code == '200' or trans.content == '[]': i
@@ -559,9 +593,9 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      
      print("Trans details" , trans_json)
      #if trans.status_code == '200' or trans.content == '[]':
-     trans_post = requests.post("http://3.81.13.0:3000/api/ChainTransaction", json=trans_json)
+     trans_post = requests.post("http://34.207.136.193:3000/api/ChainTransaction", json=trans_json)
      print("Posted content",trans_post.content)
-     result_get = requests.get("http://3.81.13.0:3000/api/Dataset", params=get_data_params)
+     result_get = requests.get("http://34.207.136.193:3000/api/Dataset", params=get_data_params)
      print("Final Result",result_get.content)
      #print(trans_post.content)
      #print(result_get.content.decision)
@@ -636,7 +670,7 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      
 
         
-     new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, requestid = requestid_domain, radiology_images = radiology_images, radiology_imaging_reports = radiology_imaging_reports, ekg = ekg, progress_notes = progress_notes, history_phy = history_phy, oper_report = oper_report, path_report = path_report, lab_report = lab_report, photographs = photographs, discharge_summaries = discharge_summaries,  health_care_billing= health_care_billing, consult = consult, medication = medication, emergency = emergency, dental  = dental, demographic = demographic,question = question, audiotape = audiotape, compliance=compliance, status = status)
+     new_hipaa_request = TrustCalcForm(ownerid =  current_user.id, requestid = requestid_domain, radiology_images = Do_you_need_details_about_radiology_images, radiology_imaging_reports = Do_you_need_details_about_radiology_imaging_reports, ekg = Do_you_need_details_about_electrocardiography, progress_notes = Do_you_need_details_about_progress_notes, history_phy = Do_you_need_details_about_history_and_physical_exams,oper_report = Do_you_need_details_about_operative_reports, path_report = Do_you_need_details_about_pathology_reports, lab_report = Do_you_need_details_about_laboratory_reports, photographs = Do_you_need_details_about_photographs_or_videotapes, discharge_summaries = Do_you_need_details_about_discharge_summaries, health_care_billing = Do_you_need_details_about_health_care_billing, consult = Do_you_need_details_about_consultation_records, medication = Do_you_need_details_about_medication_records ,emergency = Do_you_need_details_about_emergency_medicine_reports, dental  = Do_you_need_details_about_dental_records, demographic = Do_you_need_details_about_demographic_information,question = Do_you_need_details_about_questionnaires, audiotape = Do_you_need_details_about_audiotapes, compliance=compliance, status = status)
      db.session.add(new_hipaa_request)
      db.session.commit()
     
@@ -660,7 +694,8 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
      #items = cursor.fetchall()
     
         # return render_template('hipaa.html',items=items)
-     return dashboard(b)
+     #return dashboard(b)
+     return render_template('request_status.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
      #return render_template('dashboard.html', form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d)
      #return render_template('request_status.html',form=form,name = current_user.username, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
      
@@ -671,7 +706,7 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
 def print_items():
     con=sqlite3.connect("database.db")
     co = con.cursor()
-    co.execute("SELECT radiology_images,radiology_imaging_reports,progress_notes,compliance FROM trust_calc_form")
+    co.execute("SELECT radiology_images,radiology_imaging_reports,Do_you_need_details_about_progress_notes,compliance FROM trust_calc_form")
     items=co.fetchall()
     return render_template('print_items.html', items=items)
 
@@ -752,18 +787,19 @@ def submitrequest():
      #if(risk_factor >= (1.25 * data_risk)):
 
      #    risk_level = "high";
-     #elif((risk_factor >= (0.75 * data_risk)) and (risk_factor <= (1.25 * data_risk))):
+     #elif((risk_factor >= (0.75 * data_risk)) and (risk_factor <= (1.25 * data_risk)))
 
       #   risk_level = "medium";
      #else:
 
        #  risk_level = "low";
-    
+      
 
-     new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.use.data, store=form.store.data, longdata = form.longdata.data, soondata = form.soondata.data, typeofdata = form.typeofdata.data, status = 'pending')
+     new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.usage_of_data.data.usedetails, store=form.storage_of_data.data.storedetails, longdata = form.long_data_requirement.data.longdetails, soondata = form.sooner_data_requirement.data.soondetails, typeofdata = form.typeofdata.data.typedetails, status = 'pending')
      db.session.add(new_request)
     # print(new_request.requestid)
      db.session.commit()
+     flash('Your request is submitted! Please fill out domain form to complete request submission' )
      print(new_request.requestid)
 
      print("Dataset id is" , new_request.datasetid)
@@ -781,11 +817,11 @@ def submitrequest():
     # datasetid = resultset[0]
     # p=result_get.content
 
-     if(current_user.username == 'internaluser'):
-         return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
+    # if(current_user.username == 'internaluser'):
+     return render_template('dashboard.html',name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
          #return redirect('jupyter notebook')
-     elif(current_user.username == 'externaluser'):
-         return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
+     #elif(current_user.username == 'externaluser'):
+      #   return render_template('dashboard.html', name = current_user.username, form=form, pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,requestid_domain=new_request.requestid,dataset_id_final=dataset_id_final,dataset_risk=dataset_risk)
 
    # return redirect('jupyter notebook')
 
@@ -955,6 +991,10 @@ def viewdata(dataid):
     rowcount = cur.rowcount
     return render_template('viewapprovedata.html',name = current_user.username, dataid=dataid, data = data, rowcount = rowcount, record=record)
 
+@app.route('/viewdataback',methods=['GET','POST'])
+def viewdataback():
+    form = FeedbackForm()
+    return render_template('dashboard.html',form=form)
 
 
 @app.route('/feedbackform',methods=['GET','POST'])
@@ -962,9 +1002,6 @@ def feedback_form():
     form = FeedbackForm()
     return render_template('feedback.html',form=form)
 
-@app.route('/submitfeedbackform',methods=['GET','POST'])
-def submitfeedbackform():
-    return render_template('end.html')
 
 @app.route('/')
 def bc():

@@ -40,17 +40,19 @@ Dashboard
     </nav>
     
     <div class="container">
-	    <form class="form-signin" method = "POST" action="/submitrequest">
+	    <form  method = "POST" action="/submitrequest">
 		    <h2 class="form-signin-heading">Create Request</h2>
 		    {{form.hidden_tag() }}
-		    {{ wtf.form_field(form.requestname) }}
-		    {{ wtf.form_field(form.requestDescription) }}
-		    {{ wtf.form_field(form.datasetname) }}
-		    {{ wtf.form_field(form.use) }}
-		    {{ wtf.form_field(form.store) }}
-		    {{ wtf.form_field(form.longdata) }}
-		    {{ wtf.form_field(form.soondata) }}
-		    {{ wtf.form_field(form.typeofdata) }}
+		   
+			    
+				{{ wtf.form_field(form.requestname, placeholder = 'Condition information details') }}
+			    	{{ wtf.form_field(form.requestDescription, placeholder = 'Healthcare data with faster access') }}
+			    	{{ wtf.form_field(form.datasetname) }}</td></tr>
+			    	{{ wtf.form_field(form.usage_of_data) }}</td></tr>
+				{{ wtf.form_field(form.storage_of_data) }}</td></tr>
+				{{ wtf.form_field(form.long_data_requirement) }}</td></tr>
+				{{ wtf.form_field(form.sooner_data_requirement) }}</td></tr>
+				{{ wtf.form_field(form.typeofdata) }}</td></tr>
 		    <button class="btn btn-lg btn-success btn-block" type="submit">Submit Request</button>
 	    </form>
     </div> <!-- /container -->
@@ -138,6 +140,7 @@ Dashboard
        </div>
        <button type="submit" class="btn btn-success btn-block">Enter Chat</button>
    </form>
+<body background="{{ url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
 
    <input type="hidden" id="chat_context" name="conversation_id" value="{}" />
    <input type="text" id="user_input" name="user_input" class="chatbox__message" placeholder="Write here" />

@@ -25,7 +25,8 @@ View Data
 {% block content %}
 <div class="container">
  <table class="table table-striped">
-              <thead>
+ <form  method = "POST" action="/dashboard">
+	 <thead>
                
 			<th>
 			<tr><td>S.No</td>
@@ -54,6 +55,9 @@ View Data
 		<button class="btn btn-lg btn-primary btn-block"  onclick = "denyReq('{{pendingreq_info.requestid}}')" method = 'GET' type="button">Deny</button>
   
 	{% endfor %}	
+	<button class="btn btn-lg btn-success btn-block" type="submit">Next</button>
+<body background="{{ url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
+
 	</form>
 
 
