@@ -83,7 +83,7 @@ Dashboard
         <span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li><a href="#">Soumya Purohit - spvm7@mail.missouri.edu</a></li>
-	  <li><a href="#">Ramya Naga Bhamidipati - nbny6@mail.missouri.edu</a></li>
+	  <li><a href="#">Naga Ramya Bhamidipati - nbny6@mail.missouri.edu</a></li>
           
         </ul>
       </li>
@@ -125,17 +125,18 @@ Dashboard
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                <h1 class="page-header">Welcome , {{name}}</h1>
 	       <h4><a href = "https://www.youtube.com/watch?v=Vyaxh0wqsAk">Please watch the tutorial to understand how to submit a data request using Request and Domain forms</a></h4>
-	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. After receiving the data, please provide your valuable feedback in the feedback form.</h4>
-		<table>
-			<tr>
-		<form action =" {{url_for('request_form') }} " method ="get">
+	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. After receiving the data, please provide your valuable feedback in the feedback form. </h4>
+	       <h4> Below are the forms !</h4>
+	       <!--	<table> -->
+	       <!--	<tr>  -->
+		<form action ="{{url_for('request_form') }} " method ="get">
 			<td width = "20%" ><input type = "submit"class = "btn btn-success" value="Request Form"></td>
 		</form>	
-		
+		<h5></h5>
 		<form action = " {{url_for('hipaaform', requestid_domain= requestid_domain, dataset_id_final = dataset_id_final,dataset_risk = dataset_risk)}}" method = "GET">
 			<td width = "20%"><input type ="submit"  class = "btn btn-success" value="Domain Form"></td>
 		</form>
-			</tr>
+	    <!--   </tr> -->
 		</table>
 	
 	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
@@ -214,7 +215,7 @@ Dashboard
                         <!--  <th>Description</th> -->
                    </tr>
                     </thead>
-		    <body background="{{url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
+		    <body background="{{url_for('static', filename='images-background3.jpeg') }}" background-repeat:no-repeat;>
 
                     <tbody>
                               <tr>

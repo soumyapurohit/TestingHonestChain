@@ -13,15 +13,15 @@ Feedback
 {% block content %}
 <div class="container">
 
-  <form class="form-signin" method = "POST" action="/dashboard">
-    <h2 class="form-signin-heading">Feedback</h2>
+  <form  method = "POST" action="/dashboard">
+    <h2 style= text-align:center;  class="form-signin-heading">Feedback</h2>
     {{form.hidden_tag() }}
     {{ wtf.form_field(form.receival) }}
     {{ wtf.form_field(form.Input) }}
     {{ wtf.form_field(form.time_taken) }}
     {{ wtf.form_field(form.feedback_user) }}
     <button class="btn btn-lg btn-success btn-block" type="submit">Submit Feedback</button>
-<body background="{{ url_for('static', filename='images-background1.jpeg') }}" background-repeat:no-repeat;>
+<body background="{{ url_for('static', filename='images-background3.jpeg') }}" background-repeat:no-repeat;>
   </form>
 </div> <!-- /container -->
 {% endblock %}

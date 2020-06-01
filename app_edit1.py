@@ -230,14 +230,14 @@ class FeedbackForm(FlaskForm):
 
 
 class CreateRequestForm(FlaskForm):
-    requestname = StringField('Title of the Request (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=15)])
-    requestDescription =  StringField('Description (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=40)])
+    requestname = StringField('Enter the title of the request (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=15)])
+    requestDescription =  StringField('Enter the description of the request (Character Limit 40)', validators=[InputRequired(), Length(min=4, max=40)])
     #datasetname =StringField('Which dataset are you trying to access', validators=[InputRequired(), Length(min=4, max=60)]) 
     datasetname = QuerySelectField(query_factory=choice_dataset, allow_blank=True, get_label = 'nameset')
     usage_of_data =QuerySelectField(query_factory=choice_userequestdata, allow_blank=True, get_label = 'usedetails')
     storage_of_data=QuerySelectField(query_factory=choice_storerequestdata, allow_blank=True, get_label = 'storedetails')
-    long_data_requirement=QuerySelectField(query_factory=choice_longrequestdata, allow_blank=True, get_label = 'longdetails')
-    sooner_data_requirement=QuerySelectField(query_factory=choice_soonrequestdata, allow_blank=True, get_label = 'soondetails')
+    how_long_do_you_need_access_to_the_data=QuerySelectField(query_factory=choice_longrequestdata, allow_blank=True, get_label = 'longdetails')
+    how_soon_do_you_need_access_to_the_data=QuerySelectField(query_factory=choice_soonrequestdata, allow_blank=True, get_label = 'soondetails')
     #dstype = QuerySelectField(query_factory=choice_typeofdata, allow_blank=True)
     typeofdata=QuerySelectField(query_factory=choice_typerequestdata, allow_blank=True, get_label = 'typedetails')
 
@@ -769,7 +769,8 @@ def submitrequest():
          input_risk[1] = 45;
      elif(form.typeofdata.data == 'aggregated'):
          input_risk[1] = 3;
-     #dataset_risk = resultset[2];
+   
+   #dataset_risk = resultset[2];
     # accept_risk = resultset[3];
     # input_risk[2] = dataset_risk;
      #total_risk = 0;
@@ -795,7 +796,8 @@ def submitrequest():
        #  risk_level = "low";
       
 
-     new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.usage_of_data.data.usedetails, store=form.storage_of_data.data.storedetails, longdata = form.long_data_requirement.data.longdetails, soondata = form.sooner_data_requirement.data.soondetails, typeofdata = form.typeofdata.data.typedetails, status = 'pending')
+    # new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.usage_of_data.data.usedetails, store=form.storage_of_data.data.storedetails, longdata = form.how_long_do_you_want_to_access_the_data.data.longdetails, soondata = form.how_soon_do_you_need_access_to_the_data.data.soondetails, typeofdata = form.typeofdata.data.typedetails, status='pending')
+     new_request = RequestForm(ownerid =  current_user.id, requestname=form.requestname.data,datasetid = form.datasetname.data.datasetid, requestDescription=form.requestDescription.data, use=form.usage_of_data.data.usedetails, store=form.storage_of_data.data.storedetails, longdata = form.how_long_do_you_need_access_to_the_data.data.longdetails, soondata = form.how_soon_do_you_need_access_to_the_data.data.soondetails, typeofdata = form.typeofdata.data.typedetails,    status= "pending")
      db.session.add(new_request)
     # print(new_request.requestid)
      db.session.commit()
