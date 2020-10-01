@@ -87,14 +87,23 @@ Dashboard
           
         </ul>
       </li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Profile</a></li>
+
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Help
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="https://www.youtube.com/watch?v=Vyaxh0wqsAk">Tutorial</a></li>
+	  <li><a href="#">Forms</a></li>
+	  <li><a href="#">Result Images</a></li>
+
+        </ul>
+      </li>
+
+          
 	    <li><a href=" {{url_for('logout') }}">Logout</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <input type="text" class="form-control" placeholder="Search...">
-          </form>
+         
         </div>
       </div>
     </nav>
@@ -122,9 +131,9 @@ Dashboard
           </ul>
 	</div>
     -->
-       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+       <div class="main">
                <h1 class="page-header">Welcome , {{name}}</h1>
-	       <h4><a href = "https://www.youtube.com/watch?v=Vyaxh0wqsAk">Please watch the tutorial to understand how to submit a data request using Request and Domain forms</a></h4>
+	      
 	       <h4>First, please fill out the data request form to submit the needs for your project and then submit the domain form with the required fields for your project. After receiving the data, please provide your valuable feedback in the feedback form. </h4>
 	       <h4> Below are the forms !</h4>
 	       <!--	<table> -->
@@ -139,7 +148,7 @@ Dashboard
 	    <!--   </tr> -->
 		</table>
 	
-	 	<div w3-include-html="/home/ubuntu/HonestChain/templates/bot/index_bot.html"></div>
+	 
 		<h4> Please fill the feedback form</h4>
 		<table>
 			<tr>
@@ -149,91 +158,7 @@ Dashboard
 				</tr>
 		</table>
 		
-            <h2 class="sub-header">Approved Requests</h2>
-
-	    <h4> * Requests approved automatically </h4>
-	    <!--	<h4>Approved requests can be checked in Blockchain </h4>  -->
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                   <tr>
-                        <th>ID</th>
-			<th>DatasetId</th>
-			<!--  <th>Description</th> -->
-		   </tr> 
-                    </thead>
-		    <tbody>
-			      <tr>
-
-                      		
-			 {% for app_req in app_req %}
-                 <td = "ID">{{app_req['requestId']}}</td>
-                 <td><a href = "#"  onclick = "viewdata('{{app_req['datasetId']}}')" id = '{{app_req['datasetId']}}'  method ="GET">{{app_req['datasetId']}}</a></td>        
-		 
-			
-
-
-                                      </tr>
-			{% endfor %}
-
-
-
-	</table>
-
-	<h2 class="sub-header">Manual Approval Required</h2>
-        <h4> * Your data request needs to be evaluated manually! Please check the status of your request in 5 business days in this section </h4>  
-	<div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>DatasetId</th>
-
-                </tr>
-              </thead>
-              <tbody>
-                        <tr>
-                        {% for manual_req in manual_req %}
-                        <td id = '{{manual_req['requestId']}}'  method ="GET">{{manual_req['requestId']}}</td>
-                        <td id = "requestname">{{manual_req.datasetId}}</td>
-
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-
-	<h2 class="sub-header">Denied Requests</h2>
-	<h4> * Your request was denied because the parameters of the request are non-complaint and possess high risk </h4>
-
-            <!--        <h4>Approved requests can be checked in Blockchain /h4>  -->
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                   <tr>
-                        <th>ID</th>
-                        <th>DatasetId</th>
-                        <!--  <th>Description</th> -->
-                   </tr>
-                    </thead>
-		    <body background="{{url_for('static', filename='images-background3.jpeg') }}" background-repeat:no-repeat;>
-
-                    <tbody>
-                              <tr>
-
-
-                         {% for deny_req in deny_req %}
-                 <td = "ID">{{deny_req['requestId']}}</td>
-                 <td  id = '{{deny_req['datasetId']}}'  method ="GET">{{deny_req['datasetId']}}</td>
-
-
-
-
-                                      </tr>
-                        {% endfor %}
-            </div>
-      </div>
-    </div>
-   
+       </div> 
 
 
 {% endblock %}

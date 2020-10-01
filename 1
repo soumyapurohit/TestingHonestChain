@@ -328,13 +328,13 @@ def dashboard():
     
     #requestid_domain = session.get('requestId')
     get_data_params = {"requestId":str(requestid_domain)}
-    #result_get = requests.get("http://72.36.65.66:3000/api/Dataset", params=get_data_params)
-    #print("Final Result",result_get.content)
-    #b=result_get.content
-    #b =json.loads(b)
-    #app_req = [ x for x in b if x['decision'] == 'approved' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-    #deny_req = [ x for x in b if x['decision'] == 'denied'  and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
-    #manual_req = [x for x in b if x['decision'] == 'manual approval required' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+    result_get = requests.get("http://72.36.65.66:3000/api/Dataset", params=get_data_params)
+    print("Final Result",result_get.content)
+    b=result_get.content
+    b =json.loads(b)
+    app_req = [ x for x in b if x['decision'] == 'approved' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+    deny_req = [ x for x in b if x['decision'] == 'denied'  and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
+    manual_req = [x for x in b if x['decision'] == 'manual approval required' and x['last_requester'] == 'resource:org.honestchain.User#'+str(current_user.username)]
     #rows = cur.rowcount
     #query = cur.query
 
@@ -366,7 +366,7 @@ def dashboard():
            # print("Request Id is ",i.requestid)
             #print("Internal user approved request is ",i.requestname)
         
-    return render_template('request_status2.html',name = current_user.username)
+    return render_template('request_status2.html',name = current_user.username, b=b, app_req = app_req, deny_req = deny_req, manual_req = manual_req)
         
         #return render_template('dashboard.html', name = current_user.username, apprInternal_info= apprInternal_info, pendingreq_info=pendingreq_info, deniedInternal_info = deniedInternal_info, resultset = resultset)
         #return render_template('dashboard.html', pendingreq_info=pendingreq_info, apprInternal_info=apprInternal_info, deniedInternal_info=deniedInternal_info,data=data,b=b,requestid_domain=requestid_domain,len=len(b),a=a,c=c,d=d,e=e, app_req = app_req, deny_req = deny_req, manual_req = manual_req, reqid_table = reqid_table)
@@ -632,7 +632,7 @@ def submithipaaform(requestid_domain,dataset_id_final,dataset_risk):
             print(i.requestname)
             print(i.requestDescription)
 
-       
+        '''
         #New changeprint(c)
         #print[i['requestId'],i['datasetId'],i['risk_level'],i['reputation'],i['decision']]
         #print(i['requestId'])
